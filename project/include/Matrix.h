@@ -34,12 +34,20 @@ public:
 
     // Access methods
     void matrixSet(double** _data, size_t _rows, size_t _cols);
-    double** matrixGet();
-    void matrixPrint();
+    double** matrixGet() const;
+    void matrixPrint() const;
+    size_t rowsGet() const;
+    size_t colsGet() const;
+    void rowsSet(size_t _rows);
+    void colsSet(size_t _cols);
 
     // Setting methods
     void readMatrixFromFile(string _pathToFile);
-};
 
+    // Operations methods
+    static Matrix* matrixSum(const Matrix* _matrix1, const Matrix* _matrix2);
+    static Matrix* matrixComp(const Matrix* _matrix1, const Matrix* _matrix2);
+
+};
 
 #endif //LAB_1_MATRIX_H
