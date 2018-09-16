@@ -28,12 +28,15 @@ private:
 public:
     // Constructors
     Matrix();
+    Matrix(size_t _rows, size_t _cols);  // Creating of null-matrix
+    // TODO: Repair null constructor
 
     // Destructors
     ~Matrix();
 
     // Access methods
     void matrixSet(double** _data, size_t _rows, size_t _cols);
+    void matrixNullSet(size_t _rows, size_t _cols);
     double** matrixGet() const;
     void matrixPrint() const;
     size_t rowsGet() const;
@@ -47,6 +50,7 @@ public:
     // Operations methods
     static Matrix* matrixSum(const Matrix* _matrix1, const Matrix* _matrix2);
     static Matrix* matrixComp(const Matrix* _matrix1, const Matrix* _matrix2);
+    static Matrix* matrixDiff(const Matrix* _matrix1, const Matrix* _matrix2);
 
 };
 

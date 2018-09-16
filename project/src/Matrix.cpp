@@ -12,6 +12,12 @@ Matrix::Matrix() {
     cols = 0;
 }
 
+Matrix::Matrix(size_t _rows, size_t _cols) {
+    rows = _rows;
+    cols = _cols;
+    dataInit(_rows, _cols);
+}
+
 // Destructors
 
 Matrix::~Matrix() {
@@ -56,6 +62,12 @@ void Matrix::colsSet(size_t _cols) {
     cols = _cols;
 }
 
+void Matrix::matrixNullSet(size_t _rows, size_t _cols) {
+    this->dataInit(_rows, _cols);
+    rows = _rows;
+    cols = _cols;
+}
+
 // Setting methods
 
 void Matrix::readMatrixFromFile(string _pathToFile) {
@@ -87,19 +99,25 @@ void Matrix::readMatrixFromFile(string _pathToFile) {
 // Private methods
 
 void Matrix::dataDelete() {
-    for (int i = 0; i < cols; i++) {
+    for (int i = 0; i < rows; i++) {
         delete [] data[i];
     }
     delete [] data;
+    TEST
 }
 
 void Matrix::dataInit(size_t _rows, size_t _cols) {
-    if (rows != 0 && cols != 0) {
+    if (rows != 0 || cols != 0) {
         this->dataDelete();
     }
     data = new double* [_rows];
     for (int i = 0; i < _rows; i++) {
         data[i] = new double [_cols];
+    }
+    for (int i = 0; i < _rows; ++i) {
+        for (int j = 0; j < _cols; ++j) {
+            data[i][j] = 0.0;
+        }
     }
 }
 
@@ -163,5 +181,35 @@ Matrix* Matrix::matrixComp(const Matrix* _matrix1, const Matrix* _matrix2) {
     }
     Matrix* outMatrix = new Matrix;
     outMatrix->matrixSet(newData, rows1, cols2);
+    return outMatrix;
+}
+
+Matrix* Matrix::matrixDiff(const Matrix* _matrix1, const Matrix* _matrix2) {
+    // Checking for matrix compatibility
+    size_t rows1 = 0, cols1 = 0;  // Rows and cols of matrix 1
+    size_t rows2 = 0, cols2 = 0;  // Rows and cols of matrix 2
+    rows1 = _matrix1->rowsGet();
+    cols1 = _matrix1->colsGet();
+    rows2 = _matrix2->rowsGet();
+    cols2 = _matrix2->colsGet();
+    if ((rows1 != rows2) || (cols1 != cols2)) {
+        cout << "Matrixes are not compatible" << endl;
+        return NULL;
+    }
+    // Summing
+    Matrix* outMatrix = new Matrix;
+    double** data1 = _matrix1->matrixGet();
+    double** data2 = _matrix2->matrixGet();
+    double** newData = new double* [rows1];
+    for (int i = 0; i < rows1; ++i) {
+        newData[i] = new double [cols1];
+    }
+    for (int i = 0; i < rows1; ++i) {
+        for (int j = 0; j < cols1; ++j) {
+            newData[i][j] = data1[i][j] - data2[i][j];
+        }
+
+    }
+    outMatrix->matrixSet(newData, rows1, cols1);
     return outMatrix;
 }
