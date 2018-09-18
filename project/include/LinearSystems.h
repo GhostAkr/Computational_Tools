@@ -8,6 +8,5 @@
 #include "../include/Matrix.h"
 
 Matrix* gaussLinearSolve(Matrix* _A);  // Solves equations A x = B
-// TODO: Complete gaussLinearSolve with right method
 
 #endif //LAB_1_LINEARSYSTEMS_H

@@ -56,7 +56,6 @@ public:
 
     // Other methods
     int mainElement(int iteration);  // Searches for main element in matrix by lines
-
 };
 
 #endif //LAB_1_MATRIX_H
