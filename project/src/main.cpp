@@ -7,7 +7,7 @@ using std::endl;
 
 int main() {
     Matrix* A = new Matrix;
-    A->readMatrixFromFile("../data/matrix_1");
+    A->readMatrixFromFile("../data/D112.TXT");
     cout << "Matrix A is " << endl;
     A->matrixPrint();
     Matrix* Result = gaussLinearSolve(A);

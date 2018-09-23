@@ -36,3 +36,7 @@ Matrix* gaussLinearSolve(Matrix* _A) {
     }
     return result;
 }
+
+int valuationVector(Matrix* _solution) {
+
+}

@@ -8,5 +8,6 @@
 #include "../include/Matrix.h"
 
 Matrix* gaussLinearSolve(Matrix* _A);  // Solves equations A x = B
+int valuationVector(Matrix* _solution);  // Calculating of valuation vector
 
 #endif //LAB_1_LINEARSYSTEMS_H

@@ -105,7 +105,6 @@ void Matrix::dataDelete() {
         delete [] data[i];
     }
     delete [] data;
-    TEST
 }
 
 void Matrix::dataInit(size_t _rows, size_t _cols) {

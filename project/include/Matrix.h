@@ -54,6 +54,7 @@ public:
     static Matrix* matrixDiff(const Matrix* _matrix1, const Matrix* _matrix2);
     void matrixRowsChange(int firstRow, int secondRow);
 
+
     // Other methods
     int mainElement(int iteration);  // Searches for main element in matrix by lines
 };
