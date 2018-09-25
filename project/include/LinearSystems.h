@@ -7,7 +7,15 @@
 
 #include "../include/Matrix.h"
 
-Matrix* gaussLinearSolve(Matrix* _A);  // Solves equations A x = B
-int valuationVector(Matrix* _solution);  // Calculating of valuation vector
+// Linear system solving (solves equations A x = B)
+
+Matrix* gaussLinearSolve(Matrix* _A);
+Matrix* QRDecompositionSolve(Matrix* _A);
+
+// Other methods
+
+int valuationVector(Matrix* _solution, Matrix* _system);  // Calculating of valuation vector
+bool onlyDesitionCheck(Matrix* _matrix);
+Matrix* rotationMatrix(Matrix* _matrix, int line, int numOfVar);  // Calculating of rotation matrix for 'nuOfVar' element on 'line' line
 
 #endif //LAB_1_LINEARSYSTEMS_H

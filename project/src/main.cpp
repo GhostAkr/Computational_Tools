@@ -6,13 +6,15 @@ using std::cout;
 using std::endl;
 
 int main() {
+    // TODO: Fix output with wrong result
     Matrix* A = new Matrix;
-    A->readMatrixFromFile("../data/D112.TXT");
+    A->readMatrixFromFile("../data/matrix_1");
     cout << "Matrix A is " << endl;
     A->matrixPrint();
-    Matrix* Result = gaussLinearSolve(A);
-    cout << "Result is " << endl;
-    Result->matrixPrint();
+    Matrix* X = QRDecompositionSolve(A);
+    cout << "Solution is " << endl;
+    X->matrixPrint();
+    delete X;
     delete A;
     return 0;
 }

@@ -37,7 +37,6 @@ public:
 
     // Access methods
     void matrixSet(double** _data, size_t _rows, size_t _cols);
-    void matrixNullSet(size_t _rows, size_t _cols);
     double** matrixGet() const;
     void matrixPrint() const;
     size_t rowsGet() const;
@@ -53,7 +52,11 @@ public:
     static Matrix* matrixComp(const Matrix* _matrix1, const Matrix* _matrix2);
     static Matrix* matrixDiff(const Matrix* _matrix1, const Matrix* _matrix2);
     void matrixRowsChange(int firstRow, int secondRow);
+    void matrixTranspose();
 
+    // Special matrixes
+    void matrixNullSet(size_t _rows, size_t _cols);
+    void matrixOneSet(size_t _rows, size_t _cols);
 
     // Other methods
     int mainElement(int iteration);  // Searches for main element in matrix by lines

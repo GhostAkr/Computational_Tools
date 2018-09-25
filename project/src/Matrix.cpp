@@ -64,12 +64,6 @@ void Matrix::colsSet(size_t _cols) {
     cols = _cols;
 }
 
-void Matrix::matrixNullSet(size_t _rows, size_t _cols) {
-    this->dataInit(_rows, _cols);
-    rows = _rows;
-    cols = _cols;
-}
-
 // Setting methods
 
 void Matrix::readMatrixFromFile(string _pathToFile) {
@@ -155,6 +149,7 @@ Matrix* Matrix::matrixSum(const Matrix* _matrix1, const Matrix* _matrix2) {
 }
 
 Matrix* Matrix::matrixComp(const Matrix* _matrix1, const Matrix* _matrix2) {
+    // TODO: Fix leak in composition
     // Checking for matrix compatibility
     size_t rows1 = 0, cols1 = 0;  // Rows and cols of matrix 1
     size_t rows2 = 0, cols2 = 0;  // Rows and cols of matrix 2
@@ -220,6 +215,45 @@ void Matrix::matrixRowsChange(int firstRow, int secondRow) {
     data[secondRow] = data[firstRow];
     data[firstRow] = buffRow;
 }
+
+void Matrix::matrixTranspose() {
+    size_t newRows = cols;
+    size_t newCols = rows;
+    double** newData = new double* [newRows];
+    for (int i = 0; i < newRows; ++i) {
+        newData[i] = new double [newCols];
+    }
+    for (int i = 0; i < newRows; ++i) {
+        for (int j = 0; j < newCols; ++j) {
+            newData[i][j] = data[j][i];
+        }
+    }
+    this->dataDelete();
+    data = newData;
+    rows = newRows;
+    cols = newCols;
+}
+
+// Special matrixes
+
+void Matrix::matrixNullSet(size_t _rows, size_t _cols) {
+    this->dataInit(_rows, _cols);
+    rows = _rows;
+    cols = _cols;
+}
+
+void Matrix::matrixOneSet(size_t _rows, size_t _cols) {
+    if ( _rows != _cols) {
+        cout << "It's not possible to make identity matrix with such size" << endl;
+        return;
+    }
+    this->matrixNullSet(_rows, _cols);
+    for (int i = 0; i < _rows; ++i) {
+        data[i][i] = 1.0;
+    }
+}
+
+
 
 // Other methods
 
