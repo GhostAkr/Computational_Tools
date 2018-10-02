@@ -41,7 +41,7 @@ void Matrix::matrixPrint() const {
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
             //cout << fixed;
-            cout.precision(2);
+            cout.precision(4);
             cout << data[i][j] << " ";
         }
         cout << endl;
@@ -76,6 +76,32 @@ void Matrix::readMatrixFromFile(string _pathToFile) {
     size_t newCols = 0, newRows = 0;
     fileIn >> newRows;
     fileIn >> newCols;
+    this->dataInit(newRows, newCols);
+    rows = newRows;
+    cols = newCols;
+    double cellValue = 0.0;
+    int i = 0, j = 0;  // Current position in the matrix
+    // Reading data from file
+    while (fileIn >> cellValue) {
+        data[i][j] = cellValue;
+        if (++j == cols) {
+            i++;
+            j = 0;
+        }
+    }
+    fileIn.close();
+}
+
+void Matrix::readLinearSystemFromFile(string _pathToFile) {
+    std::ifstream fileIn(_pathToFile);
+    if (!fileIn) {  // Exception
+        cout << "Error while reading file" << endl;
+        return;
+    }
+    // Creating new matrix
+    size_t newCols = 0, newRows = 0;
+    fileIn >> newRows;
+    newCols = newRows + 1;
     this->dataInit(newRows, newCols);
     rows = newRows;
     cols = newCols;
@@ -232,6 +258,19 @@ void Matrix::matrixTranspose() {
     data = newData;
     rows = newRows;
     cols = newCols;
+}
+
+double Matrix::vectorNorm() {
+    if (cols != 1) {
+        cout << "It's not a vector" << endl;
+        return -1.0;
+    }
+    double norm = 0.0;
+    for (int i = 0; i < rows; ++i) {
+        norm += pow(data[i][0], 2);
+    }
+    norm = sqrt(norm);
+    return norm;
 }
 
 // Special matrixes

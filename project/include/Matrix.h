@@ -46,6 +46,7 @@ public:
 
     // Setting methods
     void readMatrixFromFile(string _pathToFile);
+    void readLinearSystemFromFile(string _pathToFile);
 
     // Operations methods
     static Matrix* matrixSum(const Matrix* _matrix1, const Matrix* _matrix2);
@@ -53,6 +54,7 @@ public:
     static Matrix* matrixDiff(const Matrix* _matrix1, const Matrix* _matrix2);
     void matrixRowsChange(int firstRow, int secondRow);
     void matrixTranspose();
+    double vectorNorm();
 
     // Special matrixes
     void matrixNullSet(size_t _rows, size_t _cols);

@@ -5,7 +5,7 @@
 #include "../include/LinearSystems.h"
 
 Matrix* gaussLinearSolve(Matrix* _A) {
-    double eps = 10e-5;  // For comparing with 0.0
+    double eps = 1e-14;  // For comparing with 0.0
     size_t rowsA = _A->rowsGet();
     size_t colsA = _A->colsGet();
     // First part
@@ -42,7 +42,7 @@ Matrix* gaussLinearSolve(Matrix* _A) {
 }
 
 bool onlyDesitionCheck(Matrix* _matrix) {
-    double eps = 10e-5;  // For comparing with 0
+    double eps = 1e-10;  // For comparing with 0
     double comp = 1.0;  // Composition of elements on the main diagonal
     for (int i = 0; i < _matrix->rowsGet(); ++i) {
         comp *= _matrix->matrixGet()[i][i];
@@ -54,8 +54,8 @@ bool onlyDesitionCheck(Matrix* _matrix) {
     }
 }
 
-int valuationVector(Matrix* _solution, Matrix* _system) {  // TODO: Finish valuationVector
-    double eps = 10e-5;  // For comparing with 0
+int valuationVector(Matrix* _solution, Matrix* _system) {
+    //double eps = 10e-5;  // For comparing with 0
     if (_solution->rowsGet() != _system->rowsGet()) {  // Exception
         cout << "Solution and system are not compatible" << endl;
         return -1;
@@ -67,26 +67,19 @@ int valuationVector(Matrix* _solution, Matrix* _system) {  // TODO: Finish valua
         bFloat[i] = 0.0;
         bDouble[i] = 0.0;
         for (int j = 0; j < rows; ++j) {
-            bFloat[i] += _solution->matrixGet()[j][0] * _system->matrixGet()[i][j];
+            bFloat[i] += (float)_solution->matrixGet()[j][0] * (float)_system->matrixGet()[i][j];
             bDouble[i] += _solution->matrixGet()[j][0] * _system->matrixGet()[i][j];
         }
-        //if (fabs(bFloat[i]) < eps) {
-        //    bFloat[i] = 0.0;
-        //}
-        //if (fabs(bDouble[i]) < eps) {
-        //    bDouble[i] = 0.0;
-        //}
     }
-    cout.precision(5);
-    cout << "b1 with usual accuracy" << endl;
+    float* residualVectorFloat = new float [rows];
+    double* residualVectorDouble = new double [rows];
     for (int i = 0; i < rows; ++i) {
-        cout << bFloat[i] << " ";
+        residualVectorFloat[i] = (float)_system->matrixGet()[i][rows] - bFloat[i];
+        residualVectorDouble[i] = _system->matrixGet()[i][rows] - bDouble[i];
     }
-    cout << endl;
-    cout << "b1 with high accuracy" << endl;
-    for (int i = 0; i < rows; ++i) {
-        cout << bDouble[i] << " ";
-    }
+    cout.precision(10);
+    cout << "Residual with usual accuracy is " << vectorNormFloat(residualVectorFloat, rows) << endl;
+    cout << "Residual with high accuracy is " << vectorNormDouble(residualVectorDouble, rows) << endl;
     cout << endl;
 }
 
@@ -113,13 +106,13 @@ Matrix* QRDecompositionSolve(Matrix* _A) {
     size_t cols = _A->colsGet();
     Matrix* rotResultMatrix = new Matrix;
     rotResultMatrix->matrixOneSet(rows, rows);
-    double eps = 10e-5;
+    double eps = 1e-14;
     for (int j = 0; j < rows - 1; ++j) {
+        int mainElem = _A->mainElement(j);
+        _A->matrixRowsChange(j, mainElem);
         for (int i = j + 1; i < rows; ++i) {
             Matrix* rotMatrix = rotationMatrix(_A, i, j);  // Getting of rotation matrix with current _A
-            //DecMatrix* tempMatr = rotResultMatrix;  // For clearing of memory
             rotResultMatrix = Matrix::matrixComp(rotMatrix, rotResultMatrix);
-            //delete tempMatr;
             _A = Matrix::matrixComp(rotMatrix, _A);
             for (int i = 0; i < rows; ++i) {
                 for (int j = 0; j < _A->colsGet(); ++j) {
@@ -137,6 +130,10 @@ Matrix* QRDecompositionSolve(Matrix* _A) {
                 _A->matrixGet()[i][j] = 0.0;
             }
         }
+    }
+    if (!onlyDesitionCheck(_A)) {
+        cout << "Linear system has infinite number of solutions or hasn't it at all" << endl;
+        return NULL;
     }
     // Solving final equations
     Matrix* b = new Matrix;
@@ -157,13 +154,43 @@ Matrix* QRDecompositionSolve(Matrix* _A) {
             result->matrixGet()[i][0] = 0.0;
         }
     }
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < rows; ++j) {
+            if (fabs(rotResultMatrix->matrixGet()[i][j]) < eps) {
+                rotResultMatrix->matrixGet()[i][j] = 0.0;
+            }
+        }
+    }
     rotResultMatrix->matrixTranspose();
     cout << "Q-Matrix is" << endl;
     rotResultMatrix->matrixPrint();
     cout << "R-Matrix is" << endl;
-    _A->matrixPrint();
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < rows; ++j) {
+            cout << _A->matrixGet()[i][j] << " ";
+        }
+        cout << endl;
+    }
     delete tmp;
     delete rotResultMatrix;
     delete b;
     return result;
+}
+
+double vectorNormDouble(double* _vector, size_t _rows) {
+    double norm = 0.0;
+    for (int i = 0; i < _rows; ++i) {
+        norm += pow(_vector[i], 2);
+    }
+    norm = sqrt(norm);
+    return norm;
+}
+
+float vectorNormFloat(float* _vector, size_t _rows) {
+    float norm = 0.0;
+    for (int i = 0; i < _rows; ++i) {
+        norm += pow(_vector[i], 2);
+    }
+    norm = sqrt(norm);
+    return norm;
 }
