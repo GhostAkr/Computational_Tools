@@ -10,6 +10,7 @@ Matrix::Matrix() {
     data = NULL;
     rows = 0;
     cols = 0;
+    type = "double";
 }
 
 Matrix::Matrix(size_t _rows, size_t _cols) {
@@ -62,6 +63,10 @@ void Matrix::rowsSet(size_t _rows) {
 
 void Matrix::colsSet(size_t _cols) {
     cols = _cols;
+}
+
+string Matrix::typeGet() {
+    return type;
 }
 
 // Setting methods
@@ -258,19 +263,6 @@ void Matrix::matrixTranspose() {
     data = newData;
     rows = newRows;
     cols = newCols;
-}
-
-double Matrix::vectorNorm() {
-    if (cols != 1) {
-        cout << "It's not a vector" << endl;
-        return -1.0;
-    }
-    double norm = 0.0;
-    for (int i = 0; i < rows; ++i) {
-        norm += pow(data[i][0], 2);
-    }
-    norm = sqrt(norm);
-    return norm;
 }
 
 // Special matrixes

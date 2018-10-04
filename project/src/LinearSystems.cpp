@@ -194,3 +194,74 @@ float vectorNormFloat(float* _vector, size_t _rows) {
     norm = sqrt(norm);
     return norm;
 }
+
+double conditionNumber(Matrix* _A) {
+    size_t rowsA = _A->rowsGet();
+    size_t colsA = _A->colsGet();
+    Matrix* A1 = new Matrix;
+    A1->matrixNullSet(rowsA, colsA);
+    Matrix* B = new Matrix;
+    B->matrixNullSet(rowsA, 1);  // Old right part of A
+    for (int i = 0; i < rowsA; ++i) {
+        B->matrixGet()[i][0] = _A->matrixGet()[i][colsA - 1];
+    }
+    for (int k = 0; k < rowsA; ++k) {
+        Matrix* Q = new Matrix;
+        Q->matrixNullSet(rowsA, colsA);
+        for (int i = 0; i < rowsA; ++i) {
+            for (int j = 0; j < rowsA; ++j) {
+                Q->matrixGet()[i][j] = _A->matrixGet()[i][j];
+            }
+        }
+        for (int i = 0; i < rowsA; ++i) {
+            Q->matrixGet()[i][colsA - 1] = 0.0;
+        }
+        Q->matrixGet()[k][colsA - 1] = 1.0;
+        Matrix* X = gaussLinearSolve(Q);
+        for (int j = 0; j < rowsA; ++j) {
+            A1->matrixGet()[j][k] = X->matrixGet()[j][0];
+        }
+        delete Q;
+    }
+    for (int i = 0; i < rowsA; ++i) {
+        _A->matrixGet()[i][colsA - 1] = B->matrixGet()[i][0];
+    }
+    double condOne = normOne(_A) * normOne(A1);
+    double condInf = normInf(_A) * normInf(A1);
+    cout << "Condition number (1) = " << condOne << endl;
+    cout << "Condition number (inf) = " << condInf << endl;
+}
+
+double normInf(Matrix* _A) {
+    double max = 0.0;
+    for (int j = 0; j < _A->colsGet() - 1; ++j) {
+        max += fabs(_A->matrixGet()[0][j]);
+    }
+    for (int i = 1; i < _A->rowsGet(); ++i) {
+        double sum = 0.0;
+        for (int j = 0; j < _A->colsGet() - 1; ++j) {
+            sum += fabs(_A->matrixGet()[i][j]);
+        }
+        if (sum > max) {
+            max = sum;
+        }
+    }
+    return max;
+}
+
+double normOne(Matrix* _A) {
+    double max = 0.0;
+    for (int i = 0; i < _A->rowsGet(); ++i) {
+        max += _A->matrixGet()[i][0];
+    }
+    for (int j = 0; j < _A->colsGet() - 1; ++j) {
+        double sum = 0.0;
+        for (int i = 0; i < _A->rowsGet(); ++i) {
+            sum += fabs(_A->matrixGet()[i][j]);
+        }
+        if (sum > max) {
+            max = sum;
+        }
+    }
+    return max;
+}

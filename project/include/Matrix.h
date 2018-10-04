@@ -20,7 +20,9 @@ class Matrix {
 private:
     // Data
     double** data;
+    //float** data;  // For usual accuracy calculations
     size_t rows, cols;
+    string type;
 
     // Private methods
     void dataDelete();  // Clearing data pointer
@@ -43,6 +45,7 @@ public:
     size_t colsGet() const;
     void rowsSet(size_t _rows);
     void colsSet(size_t _cols);
+    string typeGet();
 
     // Setting methods
     void readMatrixFromFile(string _pathToFile);
@@ -54,7 +57,6 @@ public:
     static Matrix* matrixDiff(const Matrix* _matrix1, const Matrix* _matrix2);
     void matrixRowsChange(int firstRow, int secondRow);
     void matrixTranspose();
-    double vectorNorm();
 
     // Special matrixes
     void matrixNullSet(size_t _rows, size_t _cols);

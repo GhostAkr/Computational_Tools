@@ -7,6 +7,9 @@
 
 #include "../include/Matrix.h"
 
+#define EPS1 1e-7
+#define EPS2 1e-14
+
 // Linear system solving (solves equations A x = B)
 
 Matrix* gaussLinearSolve(Matrix* _A);
@@ -19,5 +22,8 @@ bool onlyDesitionCheck(Matrix* _matrix);
 Matrix* rotationMatrix(Matrix* _matrix, int line, int numOfVar);  // Calculating of rotation matrix for 'nuOfVar' element on 'line' line
 double vectorNormDouble(double* _vector, size_t _rows);
 float vectorNormFloat(float* _vector, size_t _rows);
+double conditionNumber(Matrix* _A);
+double normInf(Matrix* _A);
+double normOne(Matrix* _A);
 
 #endif //LAB_1_LINEARSYSTEMS_H
