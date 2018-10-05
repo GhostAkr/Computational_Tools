@@ -14,7 +14,8 @@ Matrix* gaussLinearSolve(Matrix* _A) {
         _A->matrixRowsChange(mainElem, k);
         for (int i = k + 1; i < rowsA; ++i) {
             double coeff = _A->matrixGet()[i][k] / _A->matrixGet()[k][k];
-            for (int j = k; j < colsA; ++j) {
+            _A->matrixGet()[i][k] = 0.0;
+            for (int j = k + 1; j < colsA; ++j) {
                 if (fabs(_A->matrixGet()[i][j] -= _A->matrixGet()[k][j] * coeff) < eps) {  // Applying accuracy
                     _A->matrixGet()[i][j] = 0.0;
                 }
@@ -61,25 +62,20 @@ int valuationVector(Matrix* _solution, Matrix* _system) {
         return -1;
     }
     size_t rows = _solution->rowsGet();
-    float* bFloat = new float [rows];  // For calculations with usual accuracy
     double* bDouble = new double [rows];  // For calculations with high accuracy
     for (int i = 0; i < rows; ++i) {
-        bFloat[i] = 0.0;
         bDouble[i] = 0.0;
         for (int j = 0; j < rows; ++j) {
-            bFloat[i] += (float)_solution->matrixGet()[j][0] * (float)_system->matrixGet()[i][j];
             bDouble[i] += _solution->matrixGet()[j][0] * _system->matrixGet()[i][j];
         }
     }
-    float* residualVectorFloat = new float [rows];
     double* residualVectorDouble = new double [rows];
     for (int i = 0; i < rows; ++i) {
-        residualVectorFloat[i] = (float)_system->matrixGet()[i][rows] - bFloat[i];
+
         residualVectorDouble[i] = _system->matrixGet()[i][rows] - bDouble[i];
     }
     cout.precision(10);
-    cout << "Residual with usual accuracy is " << vectorNormFloat(residualVectorFloat, rows) << endl;
-    cout << "Residual with high accuracy is " << vectorNormDouble(residualVectorDouble, rows) << endl;
+    cout << "Residual is " << vectorNorm(residualVectorDouble, rows) << endl;
     cout << endl;
 }
 
@@ -177,17 +173,8 @@ Matrix* QRDecompositionSolve(Matrix* _A) {
     return result;
 }
 
-double vectorNormDouble(double* _vector, size_t _rows) {
+double vectorNorm(double* _vector, size_t _rows) {
     double norm = 0.0;
-    for (int i = 0; i < _rows; ++i) {
-        norm += pow(_vector[i], 2);
-    }
-    norm = sqrt(norm);
-    return norm;
-}
-
-float vectorNormFloat(float* _vector, size_t _rows) {
-    float norm = 0.0;
     for (int i = 0; i < _rows; ++i) {
         norm += pow(_vector[i], 2);
     }
