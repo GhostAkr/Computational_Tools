@@ -15,12 +15,12 @@ void pertrubationSolution(Matrix* _A);
 
 // Other methods
 
-int valuationVector(Matrix* _solution, Matrix* _system);  // Calculating of valuation vector
+type valuationVector(Matrix* _solution, Matrix* _system);  // Calculating of valuation vector
 bool onlyDesitionCheck(Matrix* _matrix);
 Matrix* rotationMatrix(Matrix* _matrix, int line, int numOfVar);  // Calculating of rotation matrix for 'nuOfVar' element on 'line' line
 Matrix* rotateMatrix(Matrix* _targetMatrix, int _line, int _numOfVar, type _c, type _s);  // Creates rotation matrix based on current element and rotates _targetMatrix
 type vectorNorm(type* _vector, size_t _rows);
-type conditionNumber(Matrix* _A);
+void conditionNumber(Matrix* _A);
 type normInf(Matrix* _A);
 type normOne(Matrix* _A);
 
