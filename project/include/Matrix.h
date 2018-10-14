@@ -57,7 +57,6 @@ public:
     static Matrix* matrixDiff(const Matrix* _matrix1, const Matrix* _matrix2);
     void matrixRowsChange(int firstRow, int secondRow);
     void matrixTranspose();
-	type norm();
 
     // Special matrixes
     void matrixNullSet(size_t _rows, size_t _cols);
