@@ -10,7 +10,6 @@ Matrix::Matrix() {
     data = NULL;
     rows = 0;
     cols = 0;
-    type = "double";
 }
 
 Matrix::Matrix(size_t _rows, size_t _cols) {
@@ -27,11 +26,11 @@ Matrix::~Matrix() {
 
 // Access methods
 
-double** Matrix::matrixGet() const {
+type** Matrix::matrixGet() const {
     return data;
 }
 
-void Matrix::matrixSet(double** _data, size_t _rows, size_t _cols) {
+void Matrix::matrixSet(type** _data, size_t _rows, size_t _cols) {
     this->dataDelete();
     cols = _cols;
     rows = _rows;
@@ -41,9 +40,9 @@ void Matrix::matrixSet(double** _data, size_t _rows, size_t _cols) {
 void Matrix::matrixPrint() const {
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
-            //cout << fixed;
-            cout.precision(4);
-            cout << data[i][j] << " ";
+            //cout.precision(4);
+            //cout << data[i][j] << " ";
+			printf("%.16f ", data[i][j]);
         }
         cout << endl;
     }
@@ -65,10 +64,6 @@ void Matrix::colsSet(size_t _cols) {
     cols = _cols;
 }
 
-string Matrix::typeGet() {
-    return type;
-}
-
 // Setting methods
 
 void Matrix::readMatrixFromFile(string _pathToFile) {
@@ -84,7 +79,7 @@ void Matrix::readMatrixFromFile(string _pathToFile) {
     this->dataInit(newRows, newCols);
     rows = newRows;
     cols = newCols;
-    double cellValue = 0.0;
+    type cellValue = 0.0;
     int i = 0, j = 0;  // Current position in the matrix
     // Reading data from file
     while (fileIn >> cellValue) {
@@ -110,7 +105,7 @@ void Matrix::readLinearSystemFromFile(string _pathToFile) {
     this->dataInit(newRows, newCols);
     rows = newRows;
     cols = newCols;
-    double cellValue = 0.0;
+    type cellValue = 0.0;
     int i = 0, j = 0;  // Current position in the matrix
     // Reading data from file
     while (fileIn >> cellValue) {
@@ -136,9 +131,9 @@ void Matrix::dataInit(size_t _rows, size_t _cols) {
     if (rows != 0 || cols != 0) {
         this->dataDelete();
     }
-    data = new double* [_rows];
+    data = new type* [_rows];
     for (int i = 0; i < _rows; i++) {
-        data[i] = new double [_cols];
+        data[i] = new type [_cols];
     }
     for (int i = 0; i < _rows; ++i) {
         for (int j = 0; j < _cols; ++j) {
@@ -148,6 +143,18 @@ void Matrix::dataInit(size_t _rows, size_t _cols) {
 }
 
 // Operations methods
+
+type Matrix::norm() {
+	if (cols > 1) {
+		cout << "It's not a vector" << endl;
+		return -1.0;
+	}
+	type sum = 0.0;
+	for (int k = 0; k < rows; ++k) {
+		sum += data[k][0] * data[k][0];
+	}
+	return sqrt(sum);
+}
 
 Matrix* Matrix::matrixSum(const Matrix* _matrix1, const Matrix* _matrix2) {
     // Checking for matrix compatibility
@@ -163,11 +170,11 @@ Matrix* Matrix::matrixSum(const Matrix* _matrix1, const Matrix* _matrix2) {
     }
     // Summing
     Matrix* outMatrix = new Matrix;
-    double** data1 = _matrix1->matrixGet();
-    double** data2 = _matrix2->matrixGet();
-    double** newData = new double* [rows1];
+    type** data1 = _matrix1->matrixGet();
+    type** data2 = _matrix2->matrixGet();
+    type** newData = new type* [rows1];
     for (int i = 0; i < rows1; ++i) {
-        newData[i] = new double [cols1];
+        newData[i] = new type [cols1];
     }
     for (int i = 0; i < rows1; ++i) {
         for (int j = 0; j < cols1; ++j) {
@@ -193,12 +200,17 @@ Matrix* Matrix::matrixComp(const Matrix* _matrix1, const Matrix* _matrix2) {
         return NULL;
     }
     // Composition
-    double** data1 = _matrix1->matrixGet();
-    double** data2 = _matrix2->matrixGet();
-    double** newData = new double* [rows1];
+    type** data1 = _matrix1->matrixGet();
+    type** data2 = _matrix2->matrixGet();
+    type** newData = new type* [rows1];
     for (int i = 0; i < rows1; ++i) {
-        newData[i] = new double [cols2];
+        newData[i] = new type [cols2];
     }
+	for (int i = 0; i < rows1; ++i) {
+		for (int j = 0; j < cols2; ++j) {
+			newData[i][j] = 0.0;
+		}
+	}
     for (int i = 0; i < rows1; ++i) {
         for (int j = 0; j < cols2; ++j) {
             for (int k = 0; k < cols1; ++k) {
@@ -225,11 +237,11 @@ Matrix* Matrix::matrixDiff(const Matrix* _matrix1, const Matrix* _matrix2) {
     }
     // Summing
     Matrix* outMatrix = new Matrix;
-    double** data1 = _matrix1->matrixGet();
-    double** data2 = _matrix2->matrixGet();
-    double** newData = new double* [rows1];
+    type** data1 = _matrix1->matrixGet();
+    type** data2 = _matrix2->matrixGet();
+    type** newData = new type* [rows1];
     for (int i = 0; i < rows1; ++i) {
-        newData[i] = new double [cols1];
+        newData[i] = new type [cols1];
     }
     for (int i = 0; i < rows1; ++i) {
         for (int j = 0; j < cols1; ++j) {
@@ -242,7 +254,7 @@ Matrix* Matrix::matrixDiff(const Matrix* _matrix1, const Matrix* _matrix2) {
 }
 
 void Matrix::matrixRowsChange(int firstRow, int secondRow) {
-    double* buffRow = data[secondRow];
+    type* buffRow = data[secondRow];
     data[secondRow] = data[firstRow];
     data[firstRow] = buffRow;
 }
@@ -250,9 +262,9 @@ void Matrix::matrixRowsChange(int firstRow, int secondRow) {
 void Matrix::matrixTranspose() {
     size_t newRows = cols;
     size_t newCols = rows;
-    double** newData = new double* [newRows];
+    type** newData = new type* [newRows];
     for (int i = 0; i < newRows; ++i) {
-        newData[i] = new double [newCols];
+        newData[i] = new type [newCols];
     }
     for (int i = 0; i < newRows; ++i) {
         for (int j = 0; j < newCols; ++j) {
@@ -290,7 +302,7 @@ void Matrix::matrixOneSet(size_t _rows, size_t _cols) {
 
 int Matrix::mainElement(int iteration) {
     int indexOfMainElem = iteration;
-    double mainElem = data[iteration][iteration];
+    type mainElem = data[iteration][iteration];
     for (int k = iteration; k < rows; ++k) {
         if (data[k][iteration] > mainElem) {
             mainElem = data[k][iteration];

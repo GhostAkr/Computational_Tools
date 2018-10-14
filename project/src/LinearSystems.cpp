@@ -5,7 +5,12 @@
 #include "../include/LinearSystems.h"
 
 Matrix* gaussLinearSolve(Matrix* _A) {
-    double eps = 1e-14;  // For comparing with 0.0
+	type eps = 0.0;  // For comparing with 0.0
+	if (sizeof(type) == 4) {
+		eps = 1e-9;
+	} else {
+		eps = 1e-14;
+	}
     size_t rowsA = _A->rowsGet();
     size_t colsA = _A->colsGet();
     // First part
@@ -13,12 +18,10 @@ Matrix* gaussLinearSolve(Matrix* _A) {
         int mainElem = _A->mainElement(k);
         _A->matrixRowsChange(mainElem, k);
         for (int i = k + 1; i < rowsA; ++i) {
-            double coeff = _A->matrixGet()[i][k] / _A->matrixGet()[k][k];
-            _A->matrixGet()[i][k] = 0.0;
+            type coeff = _A->matrixGet()[i][k] / _A->matrixGet()[k][k];
             for (int j = k + 1; j < colsA; ++j) {
-                if (fabs(_A->matrixGet()[i][j] -= _A->matrixGet()[k][j] * coeff) < eps) {  // Applying accuracy
-                    _A->matrixGet()[i][j] = 0.0;
-                }
+				_A->matrixGet()[i][j] -= _A->matrixGet()[k][j] * coeff;
+				_A->matrixGet()[i][k] = 0.0;
             }
         }
     }
@@ -30,7 +33,7 @@ Matrix* gaussLinearSolve(Matrix* _A) {
     Matrix* result = new Matrix;
     result->matrixNullSet(rowsA, 1);
     for (int i = rowsA - 1; i >= 0; --i) {
-        double leftSum = 0.0;
+        type leftSum = 0.0;
         for (int j = rowsA - 1; j >= i; --j) {
             leftSum += _A->matrixGet()[i][j] * result->matrixGet()[j][0];
         }
@@ -43,8 +46,14 @@ Matrix* gaussLinearSolve(Matrix* _A) {
 }
 
 bool onlyDesitionCheck(Matrix* _matrix) {
-    double eps = 1e-10;  // For comparing with 0
-    double comp = 1.0;  // Composition of elements on the main diagonal
+	type eps = 0.0;  // For comparing with 0.0
+	if (sizeof(type) == 4) {
+		eps = 1e-9;
+	}
+	else {
+		eps = 1e-14;
+	}
+    type comp = 1.0;  // Composition of elements on the main diagonal
     for (int i = 0; i < _matrix->rowsGet(); ++i) {
         comp *= _matrix->matrixGet()[i][i];
     }
@@ -56,34 +65,32 @@ bool onlyDesitionCheck(Matrix* _matrix) {
 }
 
 int valuationVector(Matrix* _solution, Matrix* _system) {
-    //double eps = 10e-5;  // For comparing with 0
     if (_solution->rowsGet() != _system->rowsGet()) {  // Exception
         cout << "Solution and system are not compatible" << endl;
         return -1;
     }
     size_t rows = _solution->rowsGet();
-    double* bDouble = new double [rows];  // For calculations with high accuracy
+    type* b = new type [rows];
     for (int i = 0; i < rows; ++i) {
-        bDouble[i] = 0.0;
+        b[i] = 0.0;
         for (int j = 0; j < rows; ++j) {
-            bDouble[i] += _solution->matrixGet()[j][0] * _system->matrixGet()[i][j];
+			type k = _solution->matrixGet()[j][0] * _system->matrixGet()[i][j];
+			b[i] += k;
         }
     }
-    double* residualVectorDouble = new double [rows];
+    type* residualVector = new type [rows];
     for (int i = 0; i < rows; ++i) {
-
-        residualVectorDouble[i] = _system->matrixGet()[i][rows] - bDouble[i];
+        residualVector[i] = _system->matrixGet()[i][rows] - b[i];
     }
-    cout.precision(10);
-    cout << "Residual is " << vectorNorm(residualVectorDouble, rows) << endl;
-    cout << endl;
+	printf("Residual is %.20f\n", vectorNorm(residualVector, rows));
 }
 
 Matrix* rotationMatrix(Matrix* _matrix, int line, int numOfVar) {
-    double a1 = _matrix->matrixGet()[numOfVar][numOfVar];  // Temporary variable
-    double a2 = _matrix->matrixGet()[line][numOfVar];  // Temporary variable
-    double c = a1 / sqrt(pow(a1, 2) + pow(a2, 2));
-    double s = a2 / sqrt(pow(a1, 2) + pow(a2, 2));
+    type a1 = _matrix->matrixGet()[numOfVar][numOfVar];  // Temporary variable
+    type a2 = _matrix->matrixGet()[line][numOfVar];  // Temporary variable
+	type denom = sqrt(a1 * a1 + a2 * a2);
+    type c = a1 / denom;
+    type s = a2 / denom;
     Matrix* result = new Matrix;
     size_t rows = _matrix->rowsGet();
     result->matrixNullSet(rows, rows);
@@ -102,29 +109,25 @@ Matrix* QRDecompositionSolve(Matrix* _A) {
     size_t cols = _A->colsGet();
     Matrix* rotResultMatrix = new Matrix;
     rotResultMatrix->matrixOneSet(rows, rows);
-    double eps = 1e-14;
+	type eps = 0.0;  // For comparing with 0.0
+	if (sizeof(type) == 4) {
+		eps = 1e-9;
+	}
+	else {
+		eps = 1e-14;
+	}
     for (int j = 0; j < rows - 1; ++j) {
         int mainElem = _A->mainElement(j);
         _A->matrixRowsChange(j, mainElem);
         for (int i = j + 1; i < rows; ++i) {
-            Matrix* rotMatrix = rotationMatrix(_A, i, j);  // Getting of rotation matrix with current _A
-            rotResultMatrix = Matrix::matrixComp(rotMatrix, rotResultMatrix);
-            _A = Matrix::matrixComp(rotMatrix, _A);
-            for (int i = 0; i < rows; ++i) {
-                for (int j = 0; j < _A->colsGet(); ++j) {
-                    if (fabs(_A->matrixGet()[i][j]) < eps) {
-                        _A->matrixGet()[i][j] = 0.0;
-                    }
-                }
-            }
-            delete rotMatrix;
-        }
-    }
-    for (int i = 0; i < rows; ++i) {  // Setting 0 on almost null elements
-        for (int j = 0; j < _A->colsGet(); ++j) {
-            if (fabs(_A->matrixGet()[i][j]) < eps) {
-                _A->matrixGet()[i][j] = 0.0;
-            }
+			type a1 = _A->matrixGet()[j][j];  // Temporary variable
+			type a2 = _A->matrixGet()[i][j];  // Temporary variable
+			type denominator = sqrt(a1 * a1 + a2 * a2);
+			type c = a1 / denominator;
+			type s = a2 / denominator;
+			rotateMatrix(_A, i, j, c, s);
+			rotateMatrix(rotResultMatrix, i, j, c, s);
+			_A->matrixGet()[i][j] = 0.0;
         }
     }
     if (!onlyDesitionCheck(_A)) {
@@ -141,7 +144,7 @@ Matrix* QRDecompositionSolve(Matrix* _A) {
     Matrix* result = new Matrix;
     result->matrixNullSet(rows, 1);
     for (int i = rows - 1; i >= 0; --i) {
-        double leftSum = 0.0;
+        type leftSum = 0.0;
         for (int j = rows - 1; j >= i; --j) {
             leftSum += _A->matrixGet()[i][j] * result->matrixGet()[j][0];
         }
@@ -173,16 +176,16 @@ Matrix* QRDecompositionSolve(Matrix* _A) {
     return result;
 }
 
-double vectorNorm(double* _vector, size_t _rows) {
-    double norm = 0.0;
+type vectorNorm(type* _vector, size_t _rows) {
+    type norm = 0.0;
     for (int i = 0; i < _rows; ++i) {
-        norm += pow(_vector[i], 2);
+		norm += _vector[i] * _vector[i];
     }
     norm = sqrt(norm);
     return norm;
 }
 
-double conditionNumber(Matrix* _A) {
+type conditionNumber(Matrix* _A) {
     size_t rowsA = _A->rowsGet();
     size_t colsA = _A->colsGet();
     Matrix* A1 = new Matrix;
@@ -200,9 +203,6 @@ double conditionNumber(Matrix* _A) {
                 Q->matrixGet()[i][j] = _A->matrixGet()[i][j];
             }
         }
-        for (int i = 0; i < rowsA; ++i) {
-            Q->matrixGet()[i][colsA - 1] = 0.0;
-        }
         Q->matrixGet()[k][colsA - 1] = 1.0;
         Matrix* X = gaussLinearSolve(Q);
         for (int j = 0; j < rowsA; ++j) {
@@ -213,19 +213,20 @@ double conditionNumber(Matrix* _A) {
     for (int i = 0; i < rowsA; ++i) {
         _A->matrixGet()[i][colsA - 1] = B->matrixGet()[i][0];
     }
-    double condOne = normOne(_A) * normOne(A1);
-    double condInf = normInf(_A) * normInf(A1);
-    cout << "Condition number (1) = " << condOne << endl;
-    cout << "Condition number (inf) = " << condInf << endl;
+    type condOne = normOne(_A) * normOne(A1);
+    type condInf = normInf(_A) * normInf(A1);
+	printf("Condition number (1) = %.14f\n", condOne);
+	printf("Condition number (inf) = %.14f\n", condInf);
+	return 0.0;
 }
 
-double normInf(Matrix* _A) {
-    double max = 0.0;
+type normInf(Matrix* _A) {
+    type max = 0.0;
     for (int j = 0; j < _A->colsGet() - 1; ++j) {
         max += fabs(_A->matrixGet()[0][j]);
     }
     for (int i = 1; i < _A->rowsGet(); ++i) {
-        double sum = 0.0;
+        type sum = 0.0;
         for (int j = 0; j < _A->colsGet() - 1; ++j) {
             sum += fabs(_A->matrixGet()[i][j]);
         }
@@ -236,13 +237,13 @@ double normInf(Matrix* _A) {
     return max;
 }
 
-double normOne(Matrix* _A) {
-    double max = 0.0;
+type normOne(Matrix* _A) {
+    type max = 0.0;
     for (int i = 0; i < _A->rowsGet(); ++i) {
-        max += _A->matrixGet()[i][0];
+        max += fabs(_A->matrixGet()[i][0]);
     }
     for (int j = 0; j < _A->colsGet() - 1; ++j) {
-        double sum = 0.0;
+        type sum = 0.0;
         for (int i = 0; i < _A->rowsGet(); ++i) {
             sum += fabs(_A->matrixGet()[i][j]);
         }
@@ -251,4 +252,70 @@ double normOne(Matrix* _A) {
         }
     }
     return max;
+}
+
+Matrix* rotateMatrix(Matrix* _targetMatrix, int _line, int _numOfVar, type _c, type _s) {
+	// Calculting coefficients
+	for (int k = 0; k < _targetMatrix->colsGet(); ++k) {
+		type sum1 = _c * _targetMatrix->matrixGet()[_numOfVar][k];
+		sum1 += _s * _targetMatrix->matrixGet()[_line][k];
+		type sum2 = -_s * _targetMatrix->matrixGet()[_numOfVar][k];
+		sum2 += _c * _targetMatrix->matrixGet()[_line][k];
+		_targetMatrix->matrixGet()[_numOfVar][k] = sum1;
+		_targetMatrix->matrixGet()[_line][k] = sum2;
+	}
+	return _targetMatrix;
+}
+
+void pertrubationSolution(Matrix* _A) {
+	Matrix* A1 = new Matrix;  // Additional matrix for counting delta X
+	type pertrubation = 0.01;
+	size_t rows = _A->rowsGet();
+	size_t cols = _A->colsGet();
+	A1->matrixNullSet(rows, cols);
+	for (int i = 0; i < rows; ++i) {
+		for (int j = 0; j < cols; ++j) {
+			A1->matrixGet()[i][j] = _A->matrixGet()[i][j];
+		}
+	}
+	Matrix* b = new Matrix;
+	b->matrixNullSet(rows, 1);
+	for (int k = 0; k < rows; ++k) {
+		b->matrixGet()[k][0] = _A->matrixGet()[k][cols - 1];
+	}
+	type bNormOne = normOne(b);
+	type bNormInf = normInf(b);
+	for (int k = 0; k < rows; ++k) {
+		_A->matrixGet()[k][cols - 1] += pertrubation;
+	}
+	for (int k = 0; k < rows; ++k) {
+		A1->matrixGet()[k][cols - 1] = pertrubation;
+	}
+	Matrix* deltaB = new Matrix;
+	deltaB->matrixNullSet(rows, 1);
+	for (int k = 0; k < rows; ++k) {
+		deltaB->matrixGet()[k][0] = pertrubation;
+	}
+	type deltaBNormOne = normOne(deltaB);
+	type deltaBNormInf = normInf(deltaB);
+	Matrix* solution = gaussLinearSolve(_A);
+	cout << "Petrubation solution is " << endl;
+	solution->matrixPrint();
+	type xNormOne = normOne(solution);
+	type xNormInf = normInf(solution);
+	Matrix* deltaX = gaussLinearSolve(A1);
+	type deltaXNormInf = normInf(deltaX);
+	type deltaXNormOne = normOne(deltaX);
+	type evaluationOne = 0.0;
+	type evaluationInf = 0.0;
+	type dXOne = deltaXNormOne / xNormOne;
+	type dBOne = deltaBNormOne / bNormOne;
+	type dXInf = deltaXNormOne / xNormInf;
+	type dBInf = deltaBNormOne / bNormInf;
+	cout << "dXOne = " << dXOne << endl;
+	cout << "dBOne = " << dBOne << endl;
+	evaluationOne = dXOne / dBOne;
+	evaluationInf = dXInf / dBInf;
+	cout << "Evaluation (one): " << evaluationOne << endl;
+	//cout << "Evaluation (inf): " << evaluationInf << endl;
 }

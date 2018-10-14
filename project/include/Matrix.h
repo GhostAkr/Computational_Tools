@@ -12,6 +12,9 @@
 
 #define TEST cout << "Test" << endl;  // Macros for debugging
 
+typedef double type;  // For calculations with high accuracy
+//typedef float type;  // For calculations with usual accuracy
+
 using std::cout;
 using std::endl;
 using std::string;
@@ -19,10 +22,8 @@ using std::string;
 class Matrix {
 private:
     // Data
-    double** data;
-    //float** data;  // For usual accuracy calculations
+    type** data;
     size_t rows, cols;
-    string type;
 
     // Private methods
     void dataDelete();  // Clearing data pointer
@@ -38,14 +39,13 @@ public:
     ~Matrix();
 
     // Access methods
-    void matrixSet(double** _data, size_t _rows, size_t _cols);
-    double** matrixGet() const;
+    void matrixSet(type** _data, size_t _rows, size_t _cols);
+    type** matrixGet() const;
     void matrixPrint() const;
     size_t rowsGet() const;
     size_t colsGet() const;
     void rowsSet(size_t _rows);
     void colsSet(size_t _cols);
-    string typeGet();
 
     // Setting methods
     void readMatrixFromFile(string _pathToFile);
@@ -57,6 +57,7 @@ public:
     static Matrix* matrixDiff(const Matrix* _matrix1, const Matrix* _matrix2);
     void matrixRowsChange(int firstRow, int secondRow);
     void matrixTranspose();
+	type norm();
 
     // Special matrixes
     void matrixNullSet(size_t _rows, size_t _cols);

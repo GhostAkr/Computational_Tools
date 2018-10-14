@@ -26,6 +26,9 @@ int main() {
     }
     cout << "Solution with Gauss method is " << endl;
     X1->matrixPrint();
+	Matrix* A1Pertrubationed = new Matrix;
+	A1Pertrubationed->readLinearSystemFromFile(PathToTest);
+	pertrubationSolution(A1Pertrubationed);
     valuationVector(X1, oldA);
     Matrix* X2 = QRDecompositionSolve(A2);
     cout << "Solution with QR-decomposition method is " << endl;
@@ -36,5 +39,6 @@ int main() {
     delete A1;
     delete A2;
     delete oldA;
+	//system("pause");
     return 0;
 }
