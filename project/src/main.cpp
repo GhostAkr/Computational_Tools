@@ -6,7 +6,7 @@ using std::cout;
 using std::endl;
 
 int main() {
-    string PathToTest = "../data/D5.TXT";
+    string PathToTest = "../data/Custom3";
     Matrix* A1 = new Matrix;
     Matrix* A2 = new Matrix;
     Matrix* oldA = new Matrix;
