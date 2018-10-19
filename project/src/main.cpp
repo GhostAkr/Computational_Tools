@@ -39,6 +39,6 @@ int main() {
     delete A1;
     delete A2;
     delete oldA;
-	//system("pause");
+    delete A1Pertrubationed;
     return 0;
 }

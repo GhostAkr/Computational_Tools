@@ -64,10 +64,10 @@ bool onlyDesitionCheck(Matrix* _matrix) {
     }
 }
 
-int valuationVector(Matrix* _solution, Matrix* _system) {
+type valuationVector(Matrix* _solution, Matrix* _system) {
     if (_solution->rowsGet() != _system->rowsGet()) {  // Exception
         cout << "Solution and system are not compatible" << endl;
-        return -1;
+        return -1.0;
     }
     size_t rows = _solution->rowsGet();
     type* b = new type [rows];
@@ -82,7 +82,11 @@ int valuationVector(Matrix* _solution, Matrix* _system) {
     for (int i = 0; i < rows; ++i) {
         residualVector[i] = _system->matrixGet()[i][rows] - b[i];
     }
-	printf("Residual is %.20f\n", vectorNorm(residualVector, rows));
+    type residual = vectorNorm(residualVector, rows);
+	printf("Residual is %.20f\n", residual);
+	delete b;
+	delete residualVector;
+	return residual;
 }
 
 Matrix* rotationMatrix(Matrix* _matrix, int line, int numOfVar) {
@@ -185,7 +189,7 @@ type vectorNorm(type* _vector, size_t _rows) {
     return norm;
 }
 
-type conditionNumber(Matrix* _A) {
+void conditionNumber(Matrix* _A) {
     size_t rowsA = _A->rowsGet();
     size_t colsA = _A->colsGet();
     Matrix* A1 = new Matrix;
@@ -209,6 +213,7 @@ type conditionNumber(Matrix* _A) {
             A1->matrixGet()[j][k] = X->matrixGet()[j][0];
         }
         delete Q;
+        delete X;
     }
     for (int i = 0; i < rowsA; ++i) {
         _A->matrixGet()[i][colsA - 1] = B->matrixGet()[i][0];
@@ -217,7 +222,8 @@ type conditionNumber(Matrix* _A) {
     type condInf = normInf(_A) * normInf(A1);
 	printf("Condition number (1) = %.14f\n", condOne);
 	printf("Condition number (inf) = %.14f\n", condInf);
-	return 0.0;
+	delete A1;
+	delete B;
 }
 
 type normInf(Matrix* _A) {
@@ -318,4 +324,9 @@ void pertrubationSolution(Matrix* _A) {
 	evaluationInf = dXInf / dBInf;
 	cout << "Evaluation (one): " << evaluationOne << endl;
 	//cout << "Evaluation (inf): " << evaluationInf << endl;
+	delete A1;
+	delete b;
+	delete deltaB;
+	delete solution;
+	delete deltaX;
 }

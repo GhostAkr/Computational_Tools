@@ -40,8 +40,6 @@ void Matrix::matrixSet(type** _data, size_t _rows, size_t _cols) {
 void Matrix::matrixPrint() const {
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
-            //cout.precision(4);
-            //cout << data[i][j] << " ";
 			printf("%.16f ", data[i][j]);
         }
         cout << endl;
@@ -143,18 +141,6 @@ void Matrix::dataInit(size_t _rows, size_t _cols) {
 }
 
 // Operations methods
-
-type Matrix::norm() {
-	if (cols > 1) {
-		cout << "It's not a vector" << endl;
-		return -1.0;
-	}
-	type sum = 0.0;
-	for (int k = 0; k < rows; ++k) {
-		sum += data[k][0] * data[k][0];
-	}
-	return sqrt(sum);
-}
 
 Matrix* Matrix::matrixSum(const Matrix* _matrix1, const Matrix* _matrix2) {
     // Checking for matrix compatibility
