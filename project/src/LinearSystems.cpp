@@ -330,3 +330,29 @@ void pertrubationSolution(Matrix* _A) {
 	delete solution;
 	delete deltaX;
 }
+
+Matrix* fixedPointIterationSolve(Matrix* _A) {
+    int rowsA = _A->rowsGet();
+    int colsA = _A->colsGet();
+    Matrix* X = new Matrix;
+    X->matrixNullSet(rowsA, 1);
+    type tau = 0.5;
+    Matrix* b = new Matrix;
+    b->matrixNullSet(rowsA, 1);
+    for (int i = 0; i < rowsA; i++) {
+        b->matrixGet()[i][0] = _A->matrixGet()[i][colsA-1];
+    }
+    Matrix* pureA = new Matrix;
+    pureA->matrixNullSet(rowsA, rowsA);
+    for (int i = 0; i < rowsA; ++i) {
+        for (int j = 0; j < rowsA; ++j) {
+            pureA->matrixGet()[i][j] = _A->matrixGet()[i][j];
+        }
+    }
+    Matrix* prevX = new Matrix;
+    Matrix* C = new Matrix;
+    do {
+        prevX = Matrix::getCopy(X);
+    } while (normOne(Matrix::matrixDiff(X, prevX)) > )
+    //X = Matrix::matrixDiff(X, Matrix::matrixDiff(Matrix::matrixConstComp(Matrix::matrixComp(pureA, X), tau), Matrix::matrixConstComp(b, tau)));
+}

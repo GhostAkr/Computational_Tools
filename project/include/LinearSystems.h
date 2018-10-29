@@ -12,6 +12,7 @@
 Matrix* gaussLinearSolve(Matrix* _A);
 Matrix* QRDecompositionSolve(Matrix* _A);
 void pertrubationSolution(Matrix* _A);
+Matrix* fixedPointIterationSolve(Matrix* _A);
 
 // Other methods
 
