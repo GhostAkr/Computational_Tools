@@ -55,6 +55,8 @@ public:
     static Matrix* matrixSum(const Matrix* _matrix1, const Matrix* _matrix2);
     static Matrix* matrixComp(const Matrix* _matrix1, const Matrix* _matrix2);
     static Matrix* matrixDiff(const Matrix* _matrix1, const Matrix* _matrix2);
+    static Matrix* matrixConstComp(const Matrix* _matrix, const type _const);
+    static Matrix* getCopy(const Matrix* _matrix);
     void matrixRowsChange(int firstRow, int secondRow);
     void matrixTranspose();
 

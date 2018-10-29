@@ -239,6 +239,32 @@ Matrix* Matrix::matrixDiff(const Matrix* _matrix1, const Matrix* _matrix2) {
     return outMatrix;
 }
 
+Matrix* Matrix::matrixConstComp(const Matrix* _matrix, const type _const) {
+    int rows = _matrix->rowsGet();
+    int cols = _matrix->colsGet();
+    Matrix* result = new Matrix;
+    result->matrixNullSet(rows, cols);
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            result->matrixGet()[i][j] = _const * _matrix->matrixGet()[i][j];
+        }
+    }
+    return result;
+}
+
+Matrix* Matrix::getCopy(const Matrix* _matrix) {
+    Matrix* copy = new Matrix;
+    int rows = _matrix->rowsGet();
+    int cols = _matrix->colsGet();
+    copy->matrixNullSet(rows, cols);
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            copy->matrixGet()[i][j] = _matrix->matrixGet()[i][j];
+        }
+    }
+    return copy;
+}
+
 void Matrix::matrixRowsChange(int firstRow, int secondRow) {
     type* buffRow = data[secondRow];
     data[secondRow] = data[firstRow];
