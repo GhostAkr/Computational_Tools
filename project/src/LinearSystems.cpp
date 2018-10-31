@@ -332,12 +332,13 @@ void pertrubationSolution(Matrix* _A) {
 }
 
 Matrix* fixedPointIterationSolve(Matrix* _A) {
+    cout << "Begin" << endl;
     int rowsA = _A->rowsGet();
     int colsA = _A->colsGet();
     Matrix* X = new Matrix;
     X->matrixNullSet(rowsA, 1);
-    type tau = 0.5;
-    type eps = 0.5;
+    type tau = 0.01;
+    type eps = 0.00001;
     Matrix* b = new Matrix;
     b->matrixNullSet(rowsA, 1);
     for (int i = 0; i < rowsA; i++) {
@@ -351,14 +352,25 @@ Matrix* fixedPointIterationSolve(Matrix* _A) {
         }
     }
     Matrix* prevX = new Matrix;
-    //Matrix* C = new Matrix;
     Matrix* E = new Matrix;
     E->matrixOneSet(rowsA, rowsA);
     Matrix* C = Matrix::matrixConstComp(Matrix::matrixDiff(Matrix::matrixConstComp(pureA, tau), E), -1);
+    cout << "C is" << endl;
+    C->matrixPrint();
+    cout << "Norm of C is " << normInf(C) << endl;
+    cout << "Before cycle" << endl;
+    size_t iteration = 0;
     do {
-        delete prevX;
+        iteration++;
         prevX = Matrix::getCopy(X);
         X = Matrix::matrixDiff(X, Matrix::matrixDiff(Matrix::matrixConstComp(Matrix::matrixComp(pureA, X), tau), Matrix::matrixConstComp(b, tau)));
-    } while (normOne(Matrix::matrixDiff(X, prevX)) > (1.0 - normOne(C)) * eps / normOne(C));
+        cout << "X on " << iteration << " iteration is" << endl;
+        X->matrixPrint();
+        cout << "prevX on " << iteration << " iteration is" << endl;
+        prevX->matrixPrint();
+        cout << "Left norm is " << normOne(Matrix::matrixDiff(X, prevX)) << endl;
+        cout << "Right part is " << (1.0 - normOne(C)) * eps / normOne(C) << endl;
+    } while (normOne(Matrix::matrixDiff(X, prevX)) > (1.0 - normInf(C)) * eps / normInf(C));
+    cout << "After cycle" << endl;
     return X;
 }
