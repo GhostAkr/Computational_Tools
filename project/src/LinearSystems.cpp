@@ -337,6 +337,7 @@ Matrix* fixedPointIterationSolve(Matrix* _A) {
     Matrix* X = new Matrix;
     X->matrixNullSet(rowsA, 1);
     type tau = 0.5;
+    type eps = 0.5;
     Matrix* b = new Matrix;
     b->matrixNullSet(rowsA, 1);
     for (int i = 0; i < rowsA; i++) {
@@ -350,9 +351,14 @@ Matrix* fixedPointIterationSolve(Matrix* _A) {
         }
     }
     Matrix* prevX = new Matrix;
-    Matrix* C = new Matrix;
+    //Matrix* C = new Matrix;
+    Matrix* E = new Matrix;
+    E->matrixOneSet(rowsA, rowsA);
+    Matrix* C = Matrix::matrixConstComp(Matrix::matrixDiff(Matrix::matrixConstComp(pureA, tau), E), -1);
     do {
+        delete prevX;
         prevX = Matrix::getCopy(X);
-    } while (normOne(Matrix::matrixDiff(X, prevX)) > )
-    //X = Matrix::matrixDiff(X, Matrix::matrixDiff(Matrix::matrixConstComp(Matrix::matrixComp(pureA, X), tau), Matrix::matrixConstComp(b, tau)));
+        X = Matrix::matrixDiff(X, Matrix::matrixDiff(Matrix::matrixConstComp(Matrix::matrixComp(pureA, X), tau), Matrix::matrixConstComp(b, tau)));
+    } while (normOne(Matrix::matrixDiff(X, prevX)) > (1.0 - normOne(C)) * eps / normOne(C));
+    return X;
 }
