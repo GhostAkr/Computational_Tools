@@ -29,6 +29,8 @@ Matrix* gaussLinearSolve(Matrix* _A) {
         cout << "Linear system has infinite number of solutions or hasn't it at all" << endl;
         return NULL;
     }
+    cout << "Triangle form is " << endl;
+    _A->matrixPrint();
     // Second part
     Matrix* result = new Matrix;
     result->matrixNullSet(rowsA, 1);
@@ -335,10 +337,19 @@ Matrix* fixedPointIterationSolve(Matrix* _A) {
     cout << "Begin" << endl;
     int rowsA = _A->rowsGet();
     int colsA = _A->colsGet();
+    for (int i = 0; i < rowsA; i++) {
+        type coefficient = _A->matrixGet()[i][i];
+        for (int j = 0; j < colsA; j++) {
+            _A->matrixGet()[i][j] /= coefficient;
+        }
+    }
     Matrix* X = new Matrix;
     X->matrixNullSet(rowsA, 1);
-    type tau = 0.01;
-    type eps = 0.00001;
+    for (int i = 0; i < rowsA; i++) {
+        X->matrixGet()[i][0];
+    }
+    type tau = 0.001;
+    type eps = 0.1;
     Matrix* b = new Matrix;
     b->matrixNullSet(rowsA, 1);
     for (int i = 0; i < rowsA; i++) {
@@ -354,22 +365,24 @@ Matrix* fixedPointIterationSolve(Matrix* _A) {
     Matrix* prevX = new Matrix;
     Matrix* E = new Matrix;
     E->matrixOneSet(rowsA, rowsA);
-    Matrix* C = Matrix::matrixConstComp(Matrix::matrixDiff(Matrix::matrixConstComp(pureA, tau), E), -1);
+    Matrix* C = Matrix::matrixDiff(E, Matrix::matrixConstComp(pureA, tau));
     cout << "C is" << endl;
     C->matrixPrint();
     cout << "Norm of C is " << normInf(C) << endl;
     cout << "Before cycle" << endl;
     size_t iteration = 0;
     do {
+
         iteration++;
         prevX = Matrix::getCopy(X);
-        X = Matrix::matrixDiff(X, Matrix::matrixDiff(Matrix::matrixConstComp(Matrix::matrixComp(pureA, X), tau), Matrix::matrixConstComp(b, tau)));
-        cout << "X on " << iteration << " iteration is" << endl;
-        X->matrixPrint();
-        cout << "prevX on " << iteration << " iteration is" << endl;
-        prevX->matrixPrint();
-        cout << "Left norm is " << normOne(Matrix::matrixDiff(X, prevX)) << endl;
-        cout << "Right part is " << (1.0 - normOne(C)) * eps / normOne(C) << endl;
+        X = Matrix::matrixSum(Matrix::matrixComp(C, X), Matrix::matrixConstComp(b, tau));
+        //cout << "X on " << iteration << " iteration is" << endl;
+       // X->matrixPrint();
+        //cout << "prevX on " << iteration << " iteration is" << endl;
+        //prevX->matrixPrint();
+        //cout << "Left norm is " << normOne(Matrix::matrixDiff(X, prevX)) << endl;
+        //cout << "Right part is " << (1.0 - normInf(C)) * eps / normInf(C) << endl;
+        //if (iteration > 10000) break;
     } while (normOne(Matrix::matrixDiff(X, prevX)) > (1.0 - normInf(C)) * eps / normInf(C));
     cout << "After cycle" << endl;
     return X;
