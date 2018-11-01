@@ -334,26 +334,25 @@ void pertrubationSolution(Matrix* _A) {
 }
 
 Matrix* fixedPointIterationSolve(Matrix* _A) {
-    cout << "Begin" << endl;
     int rowsA = _A->rowsGet();
     int colsA = _A->colsGet();
     for (int i = 0; i < rowsA; i++) {
-        type coefficient = _A->matrixGet()[i][i];
-        for (int j = 0; j < colsA; j++) {
-            _A->matrixGet()[i][j] /= coefficient;
+        if (_A->matrixGet()[i][i] < 0) {
+            for (int j = 0; j < colsA; j++) {
+                _A->matrixGet()[i][j] *= -1.0;
+            }
         }
     }
     Matrix* X = new Matrix;
     X->matrixNullSet(rowsA, 1);
-    for (int i = 0; i < rowsA; i++) {
-        X->matrixGet()[i][0];
-    }
-    type tau = 0.001;
-    type eps = 0.1;
+    type tau = 0.0076;
+    type eps = 0.01;
     Matrix* b = new Matrix;
     b->matrixNullSet(rowsA, 1);
     for (int i = 0; i < rowsA; i++) {
-        b->matrixGet()[i][0] = _A->matrixGet()[i][colsA-1];
+        type element =  _A->matrixGet()[i][colsA - 1];
+        b->matrixGet()[i][0] = element;
+        X->matrixGet()[i][0] = element;
     }
     Matrix* pureA = new Matrix;
     pureA->matrixNullSet(rowsA, rowsA);
@@ -366,24 +365,12 @@ Matrix* fixedPointIterationSolve(Matrix* _A) {
     Matrix* E = new Matrix;
     E->matrixOneSet(rowsA, rowsA);
     Matrix* C = Matrix::matrixDiff(E, Matrix::matrixConstComp(pureA, tau));
-    cout << "C is" << endl;
-    C->matrixPrint();
-    cout << "Norm of C is " << normInf(C) << endl;
-    cout << "Before cycle" << endl;
     size_t iteration = 0;
     do {
-
         iteration++;
         prevX = Matrix::getCopy(X);
         X = Matrix::matrixSum(Matrix::matrixComp(C, X), Matrix::matrixConstComp(b, tau));
-        //cout << "X on " << iteration << " iteration is" << endl;
-       // X->matrixPrint();
-        //cout << "prevX on " << iteration << " iteration is" << endl;
-        //prevX->matrixPrint();
-        //cout << "Left norm is " << normOne(Matrix::matrixDiff(X, prevX)) << endl;
-        //cout << "Right part is " << (1.0 - normInf(C)) * eps / normInf(C) << endl;
-        //if (iteration > 10000) break;
     } while (normOne(Matrix::matrixDiff(X, prevX)) > (1.0 - normInf(C)) * eps / normInf(C));
-    cout << "After cycle" << endl;
+    cout << "Number of iterations is " << iteration << endl;
     return X;
 }

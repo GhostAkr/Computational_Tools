@@ -6,7 +6,7 @@ using std::cout;
 using std::endl;
 
 int main() {
-    std::string path = "../data/D6.TXT";
+    std::string path = "../data/D7.TXT";
     Matrix* A = new Matrix;
     A->readLinearSystemFromFile(path);
     cout << "A is" << endl;
