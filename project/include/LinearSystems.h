@@ -13,6 +13,8 @@ Matrix* gaussLinearSolve(Matrix* _A);
 Matrix* QRDecompositionSolve(Matrix* _A);
 void pertrubationSolution(Matrix* _A);
 Matrix* fixedPointIterationSolve(Matrix* _A);
+Matrix* Jacobi(const Matrix* _matrix);
+Matrix* SOR(const Matrix* _matrix);
 
 // Other methods
 
@@ -24,5 +26,7 @@ type vectorNorm(type* _vector, size_t _rows);
 void conditionNumber(Matrix* _A);
 type normInf(Matrix* _A);
 type normOne(Matrix* _A);
+type normInfVect(Matrix* _A);
+type normOneVect(Matrix* _A);
 
 #endif //LAB_1_LINEARSYSTEMS_H

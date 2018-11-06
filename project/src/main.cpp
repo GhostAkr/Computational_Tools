@@ -6,11 +6,12 @@ using std::cout;
 using std::endl;
 
 int main() {
-    std::string path = "../data/D7.TXT";
+    std::string path = "../data/D6.TXT";
     Matrix* A = new Matrix;
     A->readLinearSystemFromFile(path);
     cout << "A is" << endl;
     A->matrixPrint();
+    //Matrix* result = Jacobi(A);
     Matrix* result = fixedPointIterationSolve(A);
     //Matrix* result = gaussLinearSolve(A);
     cout << "Result is" << endl;

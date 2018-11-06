@@ -250,7 +250,7 @@ type normOne(Matrix* _A) {
     for (int i = 0; i < _A->rowsGet(); ++i) {
         max += fabs(_A->matrixGet()[i][0]);
     }
-    for (int j = 0; j < _A->colsGet() - 1; ++j) {
+    for (int j = 0; j < _A->colsGet(); ++j) {
         type sum = 0.0;
         for (int i = 0; i < _A->rowsGet(); ++i) {
             sum += fabs(_A->matrixGet()[i][j]);
@@ -260,6 +260,24 @@ type normOne(Matrix* _A) {
         }
     }
     return max;
+}
+
+type normInfVect(Matrix* _A) {
+    type max = -1.0;
+    for (int i = 0; i < _A->rowsGet(); ++i) {
+        if (fabs(_A->matrixGet()[i][0]) > max) {
+            max = fabs(_A->matrixGet()[i][0]);
+        }
+    }
+    return max;
+}
+
+type normOneVect(Matrix* _A) {
+    type sum = 0.0;
+    for (int i = 0; i < _A->rowsGet(); ++i) {
+        sum += fabs(_A->matrixGet()[i][0]);
+    }
+    return sum;
 }
 
 Matrix* rotateMatrix(Matrix* _targetMatrix, int _line, int _numOfVar, type _c, type _s) {
@@ -366,11 +384,63 @@ Matrix* fixedPointIterationSolve(Matrix* _A) {
     E->matrixOneSet(rowsA, rowsA);
     Matrix* C = Matrix::matrixDiff(E, Matrix::matrixConstComp(pureA, tau));
     size_t iteration = 0;
+    type normC = normOne(C);
     do {
         iteration++;
         prevX = Matrix::getCopy(X);
         X = Matrix::matrixSum(Matrix::matrixComp(C, X), Matrix::matrixConstComp(b, tau));
-    } while (normOne(Matrix::matrixDiff(X, prevX)) > (1.0 - normInf(C)) * eps / normInf(C));
+    } while (normOneVect(Matrix::matrixDiff(X, prevX)) > (1.0 - normInf(C)) * eps / normInf(C));
     cout << "Number of iterations is " << iteration << endl;
     return X;
 }
+
+Matrix* Jacobi(const Matrix* _matrix) {
+    int n = 0;
+    double eps = 0.01;
+    size_t rows = _matrix->rowsGet();
+    size_t cols = _matrix->colsGet();
+    Matrix *X0 = new Matrix;
+    X0->matrixNullSet(rows, 1);
+    for (int i = 0; i < rows; i++)
+        X0->matrixGet()[i][0] = _matrix->matrixGet()[i][cols - 1];
+    Matrix *res = new Matrix;
+    res->matrixNullSet(rows, 1);
+    res->getCopy(X0);
+    Matrix *_C = new Matrix;
+    _C->matrixNullSet(rows, rows);
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < rows; j++)
+            if (i != j) {
+                _C->matrixGet()[i][j] = -_matrix->matrixGet()[i][j] / _matrix->matrixGet()[i][i];
+            }
+    }
+    Matrix* y = new Matrix;
+    y->matrixNullSet(rows, 1);
+    for (int i = 0; i < rows; ++i) {
+        y->matrixGet()[i][0] = _matrix->matrixGet()[i][cols - 1] / _matrix->matrixGet()[i][i];
+    }
+    type normC = normInf(_C);
+    cout << normInf(_C) << endl;
+    do {
+        n++;
+        X0 = Matrix::getCopy(res);
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols - 1; j++)
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < cols - 1; j++)
+                        if (i != j) {
+                            res->matrixGet()[i][0] -= X0->matrixGet()[j][0] * _matrix->matrixGet()[i][j];
+                        }
+                    res->matrixGet()[i][0] += _matrix->matrixGet()[i][cols - 1];
+                    res->matrixGet()[i][0] /= _matrix->matrixGet()[i][i];
+                }
+        }
+    } while (normInfVect((Matrix::matrixDiff(X0, res))) > ((1 - normC) * eps / normC));
+    cout << "Number of iterations = " << n << endl;
+    return (res);
+}
+
+Matrix* SOR(const Matrix* _matrix) {
+
+}
+
