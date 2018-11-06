@@ -28,5 +28,6 @@ type normInf(Matrix* _A);
 type normOne(Matrix* _A);
 type normInfVect(Matrix* _A);
 type normOneVect(Matrix* _A);
+Matrix* createTridiagonalMatrix(int variant);
 
 #endif //LAB_1_LINEARSYSTEMS_H

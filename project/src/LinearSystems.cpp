@@ -440,7 +440,7 @@ Matrix* Jacobi(const Matrix* _matrix) {
     return (res);
 }
 
-Matrix* SOR(const Matrix* _matrix) {
+Matrix* SOR(const Matrix* _matrix) {  // TODO: Make it for tridiagonal matrix
     int cols = _matrix->colsGet();
     int rows = _matrix->rowsGet();
     type omega = 0.3;
@@ -480,3 +480,29 @@ Matrix* SOR(const Matrix* _matrix) {
    return result;
 }
 
+Matrix* createTridiagonalMatrix(int variant) {
+    int n = 200 + variant;
+    Matrix* A = new Matrix;
+    A->matrixNullSet(n, 4);
+    for (int i = 0; i < n; ++i) {
+        if (i == 0) {
+            A->matrixGet()[i][0] = 0.0;
+        } else {
+            A->matrixGet()[i][0] = 1.0;
+        }
+        A->matrixGet()[i][1] = 4.0;
+        if (i == n - 1) {
+            A->matrixGet()[i][2] = 0.0;
+        } else {
+            A->matrixGet()[i][2] = 1.0;
+        }
+        if (i == 0) {
+            A->matrixGet()[i][3] = 6.0;
+        } else if (i == n - 1) {
+            A->matrixGet()[i][3] = 9 - 3 * (n % 2);
+        } else {
+            A->matrixGet()[i][3] = 10 - 2 * ((i - 1) % 2);
+        }
+    }
+    return A;
+}

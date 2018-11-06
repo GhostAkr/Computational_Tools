@@ -9,6 +9,7 @@ int main() {
     std::string path = "../data/D6.TXT";
     Matrix* A = new Matrix;
     A->readLinearSystemFromFile(path);
+    Matrix* A1 = createTridiagonalMatrix(1);
     cout << "A is" << endl;
     A->matrixPrint();
     //Matrix* result = Jacobi(A);
