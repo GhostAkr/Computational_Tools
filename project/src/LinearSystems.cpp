@@ -440,10 +440,10 @@ Matrix* Jacobi(const Matrix* _matrix) {
     return (res);
 }
 
-Matrix* SOR(const Matrix* _matrix) {  // TODO: Make it for tridiagonal matrix
+Matrix* SOR(const Matrix* _matrix) {  // TODO: Write break condition
     int cols = _matrix->colsGet();
     int rows = _matrix->rowsGet();
-    type omega = 0.3;
+    type omega = 1;
     type eps = 0.00001;
     Matrix* result = new Matrix;
     result->matrixNullSet(rows, 1);
@@ -453,30 +453,30 @@ Matrix* SOR(const Matrix* _matrix) {  // TODO: Make it for tridiagonal matrix
     Matrix* b = Matrix::getCopy(result);
     Matrix* prevX = new Matrix;
     size_t iteration = 0;
-   do {
+    do {
        iteration++;
        prevX = Matrix::getCopy(result);
        for (int i = 0; i < rows; ++i) {
            type sum1 = 0.0;
-           for (int j = i + 1; j < rows; ++j) {
-               type coefficient1 = _matrix->matrixGet()[i][j] / _matrix->matrixGet()[i][i];
-               sum1 += coefficient1 * result->matrixGet()[j][0];
+           if (i != rows - 1) {
+               type coefficient1 = _matrix->matrixGet()[i][2] / _matrix->matrixGet()[i][1];
+               sum1 = coefficient1 * result->matrixGet()[i + 1][0];
            }
            type sum2 = 0.0;
-           for ( int j = 0; j < i; ++j) {
-               type coefficient2 = _matrix->matrixGet()[i][j] / _matrix->matrixGet()[i][i];
-               sum2 += coefficient2 * result->matrixGet()[j][0];
+           if (i != 0) {
+               type coefficient2 = _matrix->matrixGet()[i][0] / _matrix->matrixGet()[i][1];
+               sum2 = coefficient2 * result->matrixGet()[i - 1][0];
            }
-           type coefficient = b->matrixGet()[i][0] / _matrix->matrixGet()[i][i];
+           type coefficient = b->matrixGet()[i][0] / _matrix->matrixGet()[i][1];
            result->matrixGet()[i][0] = (1.0 - omega) * result->matrixGet()[i][0] - omega * sum1 + \
            omega * coefficient - omega * sum2;
        }
        if (iteration == 1000) {
            break;
        }
-   } while (true);
+    } while (true);
        //normInfVect((Matrix::matrixDiff(prevX, result))) > ((1 - normC) * eps / normC)
-   delete b;
+       delete b;
    return result;
 }
 

@@ -15,7 +15,7 @@ int main() {
     //Matrix* result = Jacobi(A);
     //Matrix* result = fixedPointIterationSolve(A);
     //Matrix* result = gaussLinearSolve(A);
-    Matrix* result = SOR(A);
+    Matrix* result = SOR(A1);
     cout << "Result is" << endl;
     result->matrixPrint();
     return 0;
