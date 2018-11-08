@@ -16,6 +16,7 @@ void pertrubationSolution(Matrix* _A);
 Matrix* fixedPointIterationSolve(Matrix* _A);
 Matrix* Jacobi(const Matrix* _matrix);
 Matrix* SOR(const Matrix* _matrix);
+Matrix* Seidel(const Matrix* _matrix);
 
 // Other methods
 
@@ -30,7 +31,8 @@ type normOne(Matrix* _A);
 type normInfVect(Matrix* _A);
 type normOneVect(Matrix* _A);
 Matrix* createTridiagonalMatrix(int variant);
-Matrix* C_SOR(Matrix* _matrix, type omega);  // Creating of C-Matrix for SOR method with linear system _matrix
+Matrix* C_SOR(Matrix* _matrix, type omega);  // Creating of C-Matrix for SOR method with linear system _matrixMatrix* Seidel(const Matrix* _matrix);
+Matrix* CSeidel(const Matrix* _matrix);
 Matrix* inverseMatrix(const Matrix* _matrix);
-
+Matrix* QRBackTurn(Matrix* _Q, Matrix* _R, Matrix* _b);
 #endif //LAB_1_LINEARSYSTEMS_H

@@ -168,6 +168,17 @@ Matrix* QRDecompositionSolve(Matrix* _A, Matrix* Q, Matrix* R) {
     }
     rotResultMatrix->matrixTranspose();
     //cout << "Q-Matrix is" << endl;
+    Q->matrixNullSet(rows, rows);
+    R->matrixNullSet(rows, rows);
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < rows; ++j) {
+            Q->matrixGet()[i][j] = rotResultMatrix->matrixGet()[i][j];
+            R->matrixGet()[i][j] = _A->matrixGet()[i][j];
+        }
+    }
+    //cout << "A from QR is" << endl;
+    //
+    // _A->matrixPrint();
     //rotResultMatrix->matrixPrint();
 //    cout << "R-Matrix is" << endl;
 //    for (int i = 0; i < rows; ++i) {
@@ -183,7 +194,36 @@ Matrix* QRDecompositionSolve(Matrix* _A, Matrix* Q, Matrix* R) {
 }
 
 Matrix* QRBackTurn(Matrix* _Q, Matrix* _R, Matrix* _b) {
-    
+    type eps = 1e-14;
+    int rows = _R->rowsGet();
+    _Q->matrixTranspose();
+    Matrix* bb = Matrix::matrixComp(_Q, _b);
+    //cout << "bb is" << endl;
+    //bb->matrixPrint();
+    Matrix* RR = new Matrix;
+    RR->matrixNullSet(rows, rows + 1);
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < rows + 1; ++j) {
+            if (j != rows + 1) {
+                RR->matrixGet()[i][j] = _R->matrixGet()[i][j];
+            } else {
+                RR->matrixGet()[i][j] = bb->matrixGet()[i][0];
+            }
+        }
+    }
+    Matrix* result = new Matrix;
+    result->matrixNullSet(rows, 1);
+    for (int i = rows - 1; i >= 0; --i) {
+        type leftSum = 0.0;
+        for (int j = rows - 1; j >= i; --j) {
+            leftSum += RR->matrixGet()[i][j] * result->matrixGet()[j][0];
+        }
+        result->matrixGet()[i][0] = (RR->matrixGet()[i][rows] - leftSum) / RR->matrixGet()[i][i];
+        if (fabs(result->matrixGet()[i][0]) < eps) {
+            result->matrixGet()[i][0] = 0.0;
+        }
+    }
+    return result;
 }
 
 type vectorNorm(type* _vector, size_t _rows) {
@@ -485,9 +525,9 @@ Matrix* SOR(const Matrix* _matrix) {  // TODO: Write break condition
            result->matrixGet()[i][0] = (1.0 - omega) * result->matrixGet()[i][0] - omega * sum1 + \
            omega * coefficient - omega * sum2;
        }
-       if (iteration == 1000) {
-           break;
-       }
+       //if (iteration == 1000) {
+       //    break;
+       //}
     } while (normInfVect((Matrix::matrixDiff(prevX, result))) > ((1 - normC) * eps / normC));
     delete b;
     return result;
@@ -552,15 +592,21 @@ Matrix* C_SOR(Matrix* _matrix, type omega){
     return C;
 }
 
+Matrix* C_Seid(Matrix* _matrix) {
+    int rows = _matrix->rowsGet();
+}
+
 Matrix* inverseMatrix(const Matrix* _matrix) {  // TODO: Make exceptions
+    Matrix* Q = new Matrix;
+    Matrix* R = new Matrix;
     Matrix* E = new Matrix;  // Identity matrix
     int rows = _matrix->rowsGet();
     E->matrixOneSet(rows, rows);
-    Matrix* Q = new Matrix;  // Temporary equation
-    Q->matrixNullSet(rows, rows + 1);
+    Matrix* T = new Matrix;  // Temporary equation
+    T->matrixNullSet(rows, rows + 1);
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < rows; ++ j) {
-            Q->matrixGet()[i][j] = _matrix->matrixGet()[i][j];
+            T->matrixGet()[i][j] = _matrix->matrixGet()[i][j];
         }
     }
     Matrix* Result = new Matrix;
@@ -568,17 +614,89 @@ Matrix* inverseMatrix(const Matrix* _matrix) {  // TODO: Make exceptions
     for (int k = 0; k < rows; ++k) {
         for (int i = 0; i < rows; ++i) {
             if (i != k) {
-                Q->matrixGet()[i][rows] = 0.0;
+                T->matrixGet()[i][rows] = 0.0;
             } else {
-                Q->matrixGet()[i][rows] = 1.0;
+                T->matrixGet()[i][rows] = 1.0;
             }
         }
-        Matrix* X = QRDecompositionSolve(Q);
+        Matrix* b = new Matrix;
+        b->matrixNullSet(rows, 1);
+        for (int i = 0; i < rows; ++i) {
+            b->matrixGet()[i][0] = T->matrixGet()[i][rows];
+        }
+        Matrix* X = new Matrix;
+        if (k == 0) {
+            X = QRDecompositionSolve(T, Q, R);
+        } else {
+            X = QRBackTurn(Q, R, b);
+        }
         for (int i = 0; i < rows; ++i) {
             Result->matrixGet()[i][k] = X->matrixGet()[i][0];
         }
     }
     delete E;
-    delete Q;
+    delete T;
     return Result;
+}
+
+Matrix* CSeidel(const Matrix* _matrix) {
+    int cols = _matrix->colsGet();
+    int rows = _matrix->rowsGet();
+    Matrix* D = new Matrix;
+    D->matrixNullSet(rows, rows);
+    Matrix* L = new Matrix;
+    L->matrixNullSet(rows, rows);
+    Matrix* U = new Matrix;
+    U->matrixNullSet(rows, rows);
+    Matrix* E = new Matrix;
+    E->matrixOneSet(rows, rows);
+    for (int i = 0; i < rows; ++i) {
+        D->matrixGet()[i][i] = _matrix->matrixGet()[i][1];
+        if (i != rows - 1) {
+            U->matrixGet()[i][i + 1] = _matrix->matrixGet()[i][2];
+        }
+        if (i != 0) {
+            L->matrixGet()[i][i - 1] = _matrix->matrixGet()[i][0];
+        }
+    }
+    Matrix* Q = Matrix::matrixSum(D, L);
+    Matrix* Q1 = inverseMatrix(Q);
+    Matrix* Q2 = Matrix::matrixConstComp(U, -1.0);
+    Matrix* C = Matrix::matrixComp(Q1, Q2);
+    return(C);
+}
+
+Matrix* Seidel(const Matrix* _matrix) {
+    int cols = _matrix->colsGet();
+    int rows = _matrix->rowsGet();
+    type eps = 0.00001;
+    Matrix* result = new Matrix;
+    result->matrixNullSet(rows, 1);
+    for (int i = 0; i < rows; ++i) {  // Reading of right part of equation
+        result->matrixGet()[i][0] = _matrix->matrixGet()[i][cols - 1];
+    }
+    Matrix* b = Matrix::getCopy(result);
+    Matrix* prevX = new Matrix;
+    size_t iteration = 0;
+    Matrix* C = CSeidel(_matrix);
+    type normC = normInf(C);
+    do {
+        iteration++;
+        prevX = Matrix::getCopy(result);
+        result->matrixGet()[0][0] =-_matrix->matrixGet()[0][2]* result->matrixGet()[1][0]+b->matrixGet()[0][0];
+        result->matrixGet()[0][0] /= _matrix->matrixGet()[0][1];
+        for (int i = 1; i < rows - 1; i++) {
+            result->matrixGet()[i][0] = b->matrixGet()[i][0] - _matrix->matrixGet()[i - 1][0] * result->matrixGet()[i - 1][0] - _matrix->matrixGet()[i][2] * result->matrixGet()[i + 1][0];
+            result->matrixGet()[i][0] /= _matrix->matrixGet()[i][1];
+        }
+        result->matrixGet()[rows - 1][0] = -_matrix->matrixGet()[rows - 1][0] * result->matrixGet()[rows - 2][0] + b->matrixGet()[rows - 1][0];
+        result->matrixGet()[rows - 1][0] /= _matrix->matrixGet()[rows - 1][1];
+
+        if (iteration == 1000) {
+            break;
+        }
+    } while (normInfVect((Matrix::matrixDiff(prevX, result))) > ((1 - normC) * eps / normC));
+    //normInfVect((Matrix::matrixDiff(prevX, result))) > ((1 - normC) * eps / normC)
+    delete b;
+    return result;
 }
