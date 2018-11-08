@@ -10,7 +10,8 @@
 // Linear system solving (solves equations A x = B)
 
 Matrix* gaussLinearSolve(Matrix* _A);
-Matrix* QRDecompositionSolve(Matrix* _A);
+Matrix* QRDecompositionSolve(Matrix* _A, Matrix* Q, Matrix* R);
+Matrix* QRBackTurn(Matrix* _Q, Matrix* _R, Matrix* _b);
 void pertrubationSolution(Matrix* _A);
 Matrix* fixedPointIterationSolve(Matrix* _A);
 Matrix* Jacobi(const Matrix* _matrix);
@@ -29,5 +30,7 @@ type normOne(Matrix* _A);
 type normInfVect(Matrix* _A);
 type normOneVect(Matrix* _A);
 Matrix* createTridiagonalMatrix(int variant);
+Matrix* C_SOR(Matrix* _matrix, type omega);  // Creating of C-Matrix for SOR method with linear system _matrix
+Matrix* inverseMatrix(const Matrix* _matrix);
 
 #endif //LAB_1_LINEARSYSTEMS_H

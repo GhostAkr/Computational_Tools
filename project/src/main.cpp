@@ -10,8 +10,8 @@ int main() {
     Matrix* A = new Matrix;
     A->readLinearSystemFromFile(path);
     Matrix* A1 = createTridiagonalMatrix(1);
-    cout << "A is" << endl;
-    A->matrixPrint();
+    //cout << "A1 is" << endl;
+    //A1->matrixPrint();
     //Matrix* result = Jacobi(A);
     //Matrix* result = fixedPointIterationSolve(A);
     //Matrix* result = gaussLinearSolve(A);

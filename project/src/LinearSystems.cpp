@@ -110,7 +110,7 @@ Matrix* rotationMatrix(Matrix* _matrix, int line, int numOfVar) {
     return result;
 }
 
-Matrix* QRDecompositionSolve(Matrix* _A) {
+Matrix* QRDecompositionSolve(Matrix* _A, Matrix* Q, Matrix* R) {
     size_t rows = _A->rowsGet();
     size_t cols = _A->colsGet();
     Matrix* rotResultMatrix = new Matrix;
@@ -167,19 +167,23 @@ Matrix* QRDecompositionSolve(Matrix* _A) {
         }
     }
     rotResultMatrix->matrixTranspose();
-    cout << "Q-Matrix is" << endl;
-    rotResultMatrix->matrixPrint();
-    cout << "R-Matrix is" << endl;
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < rows; ++j) {
-            cout << _A->matrixGet()[i][j] << " ";
-        }
-        cout << endl;
-    }
+    //cout << "Q-Matrix is" << endl;
+    //rotResultMatrix->matrixPrint();
+//    cout << "R-Matrix is" << endl;
+//    for (int i = 0; i < rows; ++i) {
+//        for (int j = 0; j < rows; ++j) {
+//            cout << _A->matrixGet()[i][j] << " ";
+//        }
+//        cout << endl;
+//    }
     delete tmp;
     delete rotResultMatrix;
     delete b;
     return result;
+}
+
+Matrix* QRBackTurn(Matrix* _Q, Matrix* _R, Matrix* _b) {
+    
 }
 
 type vectorNorm(type* _vector, size_t _rows) {
@@ -453,6 +457,16 @@ Matrix* SOR(const Matrix* _matrix) {  // TODO: Write break condition
     Matrix* b = Matrix::getCopy(result);
     Matrix* prevX = new Matrix;
     size_t iteration = 0;
+    Matrix* A = new Matrix;
+    A->matrixNullSet(rows, rows);
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < rows; ++j) {
+            A->matrixGet()[i][j] = _matrix->matrixGet()[i][j];
+        }
+    }
+    Matrix* C = C_SOR(A, omega);
+    type normC = normInf(C);
+    cout << "Norm C = " << normC << endl;
     do {
        iteration++;
        prevX = Matrix::getCopy(result);
@@ -474,10 +488,9 @@ Matrix* SOR(const Matrix* _matrix) {  // TODO: Write break condition
        if (iteration == 1000) {
            break;
        }
-    } while (true);
-       //normInfVect((Matrix::matrixDiff(prevX, result))) > ((1 - normC) * eps / normC)
-       delete b;
-   return result;
+    } while (normInfVect((Matrix::matrixDiff(prevX, result))) > ((1 - normC) * eps / normC));
+    delete b;
+    return result;
 }
 
 Matrix* createTridiagonalMatrix(int variant) {
@@ -505,4 +518,67 @@ Matrix* createTridiagonalMatrix(int variant) {
         }
     }
     return A;
+}
+
+Matrix* C_SOR(Matrix* _matrix, type omega){
+    int rows = _matrix->rowsGet();
+    Matrix* D = new Matrix;
+    D->matrixNullSet(rows, rows);
+    Matrix* L = new Matrix;
+    L->matrixNullSet(rows, rows);
+    Matrix* U = new Matrix;
+    U->matrixNullSet(rows, rows);
+    Matrix* E = new Matrix;
+    E->matrixOneSet(rows, rows);
+    for (int i = 0; i < rows; ++i) {
+        D->matrixGet()[i][i] = _matrix->matrixGet()[i][1];
+        if (i != rows - 1) {
+            U->matrixGet()[i][i + 1] = _matrix->matrixGet()[i][2];
+        }
+        if (i != 0) {
+            L->matrixGet()[i][i - 1] = _matrix->matrixGet()[i][0];
+        }
+    }
+    Matrix* Q = Matrix::matrixSum(Matrix::matrixConstComp(D, 1 / omega), L);
+    Matrix* Q1 = inverseMatrix(Q);
+    Matrix* Q2 = Matrix::matrixDiff(Matrix::matrixConstComp(D, (1 / omega - 1)), U);
+    Matrix* C = Matrix::matrixComp(Q1, Q2);
+    delete Q;
+    delete D;
+    delete L;
+    delete E;
+    delete U;
+    delete Q1;
+    return C;
+}
+
+Matrix* inverseMatrix(const Matrix* _matrix) {  // TODO: Make exceptions
+    Matrix* E = new Matrix;  // Identity matrix
+    int rows = _matrix->rowsGet();
+    E->matrixOneSet(rows, rows);
+    Matrix* Q = new Matrix;  // Temporary equation
+    Q->matrixNullSet(rows, rows + 1);
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < rows; ++ j) {
+            Q->matrixGet()[i][j] = _matrix->matrixGet()[i][j];
+        }
+    }
+    Matrix* Result = new Matrix;
+    Result->matrixNullSet(rows, rows);
+    for (int k = 0; k < rows; ++k) {
+        for (int i = 0; i < rows; ++i) {
+            if (i != k) {
+                Q->matrixGet()[i][rows] = 0.0;
+            } else {
+                Q->matrixGet()[i][rows] = 1.0;
+            }
+        }
+        Matrix* X = QRDecompositionSolve(Q);
+        for (int i = 0; i < rows; ++i) {
+            Result->matrixGet()[i][k] = X->matrixGet()[i][0];
+        }
+    }
+    delete E;
+    delete Q;
+    return Result;
 }
