@@ -33,6 +33,6 @@ type normOneVect(Matrix* _A);
 Matrix* createTridiagonalMatrix(int variant);
 Matrix* C_SOR(Matrix* _matrix, type omega);  // Creating of C-Matrix for SOR method with linear system _matrixMatrix* Seidel(const Matrix* _matrix);
 Matrix* CSeidel(const Matrix* _matrix);
-Matrix* inverseMatrix(const Matrix* _matrix);
-Matrix* QRBackTurn(Matrix* _Q, Matrix* _R, Matrix* _b);
+Matrix* inverseMatrix(const Matrix* _matrix);  // TODO: Move this to Matrix class
+type pogrNorm(Matrix* _solution, Matrix* _realSolution);
 #endif //LAB_1_LINEARSYSTEMS_H
