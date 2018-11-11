@@ -429,12 +429,13 @@ Matrix* fixedPointIterationSolve(Matrix* _A) {
         X = Matrix::matrixSum(Matrix::matrixComp(C, X), Matrix::matrixConstComp(b, tau));
     } while (normInfVect(Matrix::matrixDiff(X, prevX)) > (1.0 - normC) * eps / normC);
     cout << "Number of iterations is " << iteration << endl;
+    delete b;
+    delete E;
+    delete C;
     return X;
 }
 
 Matrix* Jacobi(const Matrix* _matrix) {
-    cout << "Matr" << endl;
-    _matrix->matrixPrint();
     int n = 0;
     double eps = 0.01;
     size_t rows = _matrix->rowsGet();
@@ -478,6 +479,8 @@ Matrix* Jacobi(const Matrix* _matrix) {
         }
     } while (normInfVect((Matrix::matrixDiff(X0, res))) > ((1 - normC) * eps / normC));
     cout << "Number of iterations = " << n << endl;
+    delete X0;
+    delete y;
     return (res);
 }
 
