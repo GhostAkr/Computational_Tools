@@ -464,16 +464,19 @@ Matrix* Jacobi(const Matrix* _matrix) {
     do {
         n++;
         X0 = Matrix::getCopy(res);
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols - 1; j++) {
+        for (int i = 0; i < rows; ++i) {
+            type sum = 0.0;
+            type y = _matrix->matrixGet()[i][cols - 1] / _matrix->matrixGet()[i][i];
+            for (int j = 0; j < cols - 1; ++j) {
+                type coefficient = 0.0;
                 if (i != j) {
-                    res->matrixGet()[i][0] -= X0->matrixGet()[j][0] * _matrix->matrixGet()[i][j];
+                    coefficient = -_matrix->matrixGet()[i][j] / _matrix->matrixGet()[i][i];
                 }
+                sum += coefficient * res->matrixGet()[j][0];
             }
-            res->matrixGet()[i][0] += _matrix->matrixGet()[i][cols - 1];
-            res->matrixGet()[i][0] /= _matrix->matrixGet()[i][i];
+            res->matrixGet()[i][0] = sum + y;
         }
-    }while(n < 21);// while (normInfVect((Matrix::matrixDiff(X0, res))) > ((1 - normC) * eps / normC));
+    } while (normInfVect((Matrix::matrixDiff(X0, res))) > ((1 - normC) * eps / normC));
     cout << "Number of iterations = " << n << endl;
     return (res);
 }
@@ -519,9 +522,6 @@ Matrix* SOR(const Matrix* _matrix) {  // TODO: Write break condition
            result->matrixGet()[i][0] = (1.0 - omega) * result->matrixGet()[i][0] - omega * sum1 + \
            omega * coefficient - omega * sum2;
        }
-       //if (iteration == 1000) {
-       //    break;
-       //}
     } while (normInfVect((Matrix::matrixDiff(prevX, result))) > ((1 - normC) * eps / normC));
     cout << "Number of iterations = " << iteration << endl;
     delete b;
@@ -585,10 +585,6 @@ Matrix* C_SOR(Matrix* _matrix, type omega){
     delete U;
     delete Q1;
     return C;
-}
-
-Matrix* C_Seid(Matrix* _matrix) {
-    int rows = _matrix->rowsGet();
 }
 
 Matrix* inverseMatrix(const Matrix* _matrix) {  // TODO: Make exceptions
