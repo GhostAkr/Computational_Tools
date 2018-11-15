@@ -1,6 +1,7 @@
 #include <iostream>
 #include "../include/Matrix.h"
 #include "../include/LinearSystems.h"
+#include "../include/Interpolation.h"
 
 using std::cout;
 using std::endl;
