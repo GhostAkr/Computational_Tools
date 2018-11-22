@@ -35,4 +35,7 @@ Matrix* C_SOR(Matrix* _matrix, type omega);  // Creating of C-Matrix for SOR met
 Matrix* CSeidel(const Matrix* _matrix);
 Matrix* inverseMatrix(const Matrix* _matrix);  // TODO: Move this to Matrix class
 type pogrNorm(Matrix* _solution, Matrix* _realSolution);
+
+type CLNorm(Matrix* _C);
+type CUNorm(Matrix* _C);
 #endif //LAB_1_LINEARSYSTEMS_H

@@ -396,8 +396,8 @@ Matrix* fixedPointIterationSolve(Matrix* _A) {
     }
     Matrix* X = new Matrix;
     X->matrixNullSet(rowsA, 1);
-    type tau = 0.0075;
-    type eps = 0.01;
+    type tau = 0.0072;
+    type eps = 1e-7;
     Matrix* b = new Matrix;
     b->matrixNullSet(rowsA, 1);
     for (int i = 0; i < rowsA; i++) {
@@ -437,7 +437,7 @@ Matrix* fixedPointIterationSolve(Matrix* _A) {
 
 Matrix* Jacobi(const Matrix* _matrix) {
     int n = 0;
-    double eps = 0.01;
+    double eps = 1e-7;
     size_t rows = _matrix->rowsGet();
     size_t cols = _matrix->colsGet();
     Matrix *X0 = new Matrix;
@@ -488,7 +488,7 @@ Matrix* SOR(const Matrix* _matrix) {  // TODO: Write break condition
     int cols = _matrix->colsGet();
     int rows = _matrix->rowsGet();
     type omega = 1.001;
-    type eps = 0.000001;
+    type eps = 1e-4;
     Matrix* result = new Matrix;
     result->matrixNullSet(rows, 1);
     for (int i = 0; i < rows; ++i) {  // Reading of right part of equation
@@ -507,6 +507,8 @@ Matrix* SOR(const Matrix* _matrix) {  // TODO: Write break condition
     Matrix* C = C_SOR(A, omega);
     type normC = normInf(C);
     cout << "Norm C = " << normC << endl;
+    cout << "Norm CU = " << CUNorm(C) << endl;
+    cout << "Norm CL = " << CLNorm(C) << endl;
     do {
        iteration++;
        prevX = Matrix::getCopy(result);
@@ -670,7 +672,7 @@ Matrix* CSeidel(const Matrix* _matrix) {
 Matrix* Seidel(const Matrix* _matrix) {
     int cols = _matrix->colsGet();
     int rows = _matrix->rowsGet();
-    type eps = 0.00001;
+    type eps = 1e-7;
     Matrix* result = new Matrix;
     result->matrixNullSet(rows, 1);
     for (int i = 0; i < rows; ++i) {  // Reading of right part of equation
@@ -682,6 +684,8 @@ Matrix* Seidel(const Matrix* _matrix) {
     Matrix* C = CSeidel(_matrix);
     type normC = normInf(C);
     cout << "Norm C = " << normC << endl;
+    cout << "Norm CU = " << CUNorm(C) << endl;
+    cout << "Norm CL = " << CLNorm(C) << endl;
     do {
         iteration++;
         prevX = Matrix::getCopy(result);
@@ -704,5 +708,31 @@ Matrix* Seidel(const Matrix* _matrix) {
 type pogrNorm(Matrix* _solution, Matrix* _realSolution){
     Matrix* pogr = Matrix::matrixDiff(_solution, _realSolution);
     type norm = normInfVect(pogr);
+    return norm;
+}
+
+type CLNorm(Matrix* _C) {
+    int rows = _C->rowsGet();
+    Matrix* tmp = Matrix::getCopy(_C);
+    for (int i = 0; i < rows; ++i) {
+        for (int j = i; j < rows; ++j) {
+            tmp->matrixGet()[i][j] = 0.0;
+        }
+    }
+    type norm = normInf(tmp);
+    delete tmp;
+    return norm;
+}
+
+type CUNorm(Matrix* _C) {
+    int rows = _C->rowsGet();
+    Matrix* tmp = Matrix::getCopy(_C);
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < i + 1; ++j) {
+            tmp->matrixGet()[i][j] = 0.0;
+        }
+    }
+    type norm = normInf(tmp);
+    delete tmp;
     return norm;
 }
