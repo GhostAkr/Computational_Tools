@@ -141,6 +141,12 @@ Matrix* QRDecompositionSolve(Matrix* _A, Matrix* Q, Matrix* R) {
         return NULL;
     }
     // Solving final equations
+    Matrix* b = new Matrix;
+    b->matrixNullSet(rows, 1);
+    for (int i = 0; i < rows; ++i) {
+        b->matrixGet()[i][0] = _A->matrixGet()[i][rows];
+    }
+    Matrix* tmp = Matrix::matrixComp(rotResultMatrix, b);
     Matrix* result = new Matrix;
     result->matrixNullSet(rows, 1);
     for (int i = rows - 1; i >= 0; --i) {
@@ -161,11 +167,7 @@ Matrix* QRDecompositionSolve(Matrix* _A, Matrix* Q, Matrix* R) {
         }
     }
     rotResultMatrix->matrixTranspose();
-    if (Q == nullptr || R == nullptr) {
-        delete rotResultMatrix;
-        return result;
-    }
-    // Fulfillment of Q and R matrices
+    //cout << "Q-Matrix is" << endl;
     Q->matrixNullSet(rows, rows);
     R->matrixNullSet(rows, rows);
     for (int i = 0; i < rows; ++i) {
@@ -174,21 +176,30 @@ Matrix* QRDecompositionSolve(Matrix* _A, Matrix* Q, Matrix* R) {
             R->matrixGet()[i][j] = _A->matrixGet()[i][j];
         }
     }
+    //cout << "A from QR is" << endl;
+    //
+    // _A->matrixPrint();
+    //rotResultMatrix->matrixPrint();
+//    cout << "R-Matrix is" << endl;
+//    for (int i = 0; i < rows; ++i) {
+//        for (int j = 0; j < rows; ++j) {
+//            cout << _A->matrixGet()[i][j] << " ";
+//        }
+//        cout << endl;
+//    }
+    delete tmp;
     delete rotResultMatrix;
+    delete b;
     return result;
 }
 
 Matrix* QRBackTurn(Matrix* _Q, Matrix* _R, Matrix* _b) {
-    type eps = 0.0;
-    if (sizeof(type) == 4) {
-        eps = 1e-9;
-    }
-    else {
-        eps = 1e-14;
-    }
+    type eps = 1e-14;
     int rows = _R->rowsGet();
     _Q->matrixTranspose();
-    Matrix* bb = Matrix::matrixComp(_Q, _b);  // Right part of temporary equation
+    Matrix* bb = Matrix::matrixComp(_Q, _b);
+    //cout << "bb is" << endl;
+    //bb->matrixPrint();
     Matrix* RR = new Matrix;
     RR->matrixNullSet(rows, rows + 1);
     for (int i = 0; i < rows; ++i) {
@@ -396,8 +407,8 @@ Matrix* fixedPointIterationSolve(Matrix* _A) {
     }
     Matrix* X = new Matrix;
     X->matrixNullSet(rowsA, 1);
-    type tau = 0.0075;
-    type eps = 0.01;
+    type tau = 0.0072;
+    type eps = 1e-7;
     Matrix* b = new Matrix;
     b->matrixNullSet(rowsA, 1);
     for (int i = 0; i < rowsA; i++) {
@@ -415,29 +426,21 @@ Matrix* fixedPointIterationSolve(Matrix* _A) {
     Matrix* prevX = new Matrix;
     Matrix* E = new Matrix;
     E->matrixOneSet(rowsA, rowsA);
-    cout << "Pure A is " << endl;
-    pureA->matrixPrint();
     Matrix* C = Matrix::matrixDiff(E, Matrix::matrixConstComp(pureA, tau));
-    cout << "C is " << endl;
-    C->matrixPrint();
     size_t iteration = 0;
-    type normC = normInf(C);
-    cout << "Norm of C is " << normC << endl;
+    type normC = normOne(C);
     do {
         iteration++;
         prevX = Matrix::getCopy(X);
         X = Matrix::matrixSum(Matrix::matrixComp(C, X), Matrix::matrixConstComp(b, tau));
-    } while (normInfVect(Matrix::matrixDiff(X, prevX)) > (1.0 - normC) * eps / normC);
+    } while (normOneVect(Matrix::matrixDiff(X, prevX)) > (1.0 - normInf(C)) * eps / normInf(C));
     cout << "Number of iterations is " << iteration << endl;
-    delete b;
-    delete E;
-    delete C;
     return X;
 }
 
 Matrix* Jacobi(const Matrix* _matrix) {
     int n = 0;
-    double eps = 0.01;
+    double eps = 1e-7;
     size_t rows = _matrix->rowsGet();
     size_t cols = _matrix->colsGet();
     Matrix *X0 = new Matrix;
@@ -465,22 +468,19 @@ Matrix* Jacobi(const Matrix* _matrix) {
     do {
         n++;
         X0 = Matrix::getCopy(res);
-        for (int i = 0; i < rows; ++i) {
-            type sum = 0.0;
-            type y = _matrix->matrixGet()[i][cols - 1] / _matrix->matrixGet()[i][i];
-            for (int j = 0; j < cols - 1; ++j) {
-                type coefficient = 0.0;
-                if (i != j) {
-                    coefficient = -_matrix->matrixGet()[i][j] / _matrix->matrixGet()[i][i];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols - 1; j++)
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < cols - 1; j++)
+                        if (i != j) {
+                            res->matrixGet()[i][0] -= X0->matrixGet()[j][0] * _matrix->matrixGet()[i][j];
+                        }
+                    res->matrixGet()[i][0] += _matrix->matrixGet()[i][cols - 1];
+                    res->matrixGet()[i][0] /= _matrix->matrixGet()[i][i];
                 }
-                sum += coefficient * res->matrixGet()[j][0];
-            }
-            res->matrixGet()[i][0] = sum + y;
         }
     } while (normInfVect((Matrix::matrixDiff(X0, res))) > ((1 - normC) * eps / normC));
     cout << "Number of iterations = " << n << endl;
-    delete X0;
-    delete y;
     return (res);
 }
 
@@ -488,7 +488,7 @@ Matrix* SOR(const Matrix* _matrix) {  // TODO: Write break condition
     int cols = _matrix->colsGet();
     int rows = _matrix->rowsGet();
     type omega = 1.001;
-    type eps = 0.000001;
+    type eps = 1e-4;
     Matrix* result = new Matrix;
     result->matrixNullSet(rows, 1);
     for (int i = 0; i < rows; ++i) {  // Reading of right part of equation
@@ -507,6 +507,8 @@ Matrix* SOR(const Matrix* _matrix) {  // TODO: Write break condition
     Matrix* C = C_SOR(A, omega);
     type normC = normInf(C);
     cout << "Norm C = " << normC << endl;
+    cout << "Norm CU = " << CUNorm(C) << endl;
+    cout << "Norm CL = " << CLNorm(C) << endl;
     do {
        iteration++;
        prevX = Matrix::getCopy(result);
@@ -525,8 +527,10 @@ Matrix* SOR(const Matrix* _matrix) {  // TODO: Write break condition
            result->matrixGet()[i][0] = (1.0 - omega) * result->matrixGet()[i][0] - omega * sum1 + \
            omega * coefficient - omega * sum2;
        }
+       //if (iteration == 1000) {
+       //    break;
+       //}
     } while (normInfVect((Matrix::matrixDiff(prevX, result))) > ((1 - normC) * eps / normC));
-    cout << "Number of iterations = " << iteration << endl;
     delete b;
     return result;
 }
@@ -633,44 +637,40 @@ Matrix* inverseMatrix(const Matrix* _matrix) {  // TODO: Make exceptions
     return Result;
 }
 
+
 Matrix* CSeidel(const Matrix* _matrix) {
-    int cols = _matrix->colsGet();
-    int rows = _matrix->rowsGet();
-    Matrix* D = new Matrix;
-    D->matrixNullSet(rows, rows);
-    Matrix* L = new Matrix;
-    L->matrixNullSet(rows, rows);
-    Matrix* U = new Matrix;
-    U->matrixNullSet(rows, rows);
-    Matrix* E = new Matrix;
-    E->matrixOneSet(rows, rows);
-    for (int i = 0; i < rows; ++i) {
-        D->matrixGet()[i][i] = _matrix->matrixGet()[i][1];
-        if (i != rows - 1) {
-            U->matrixGet()[i][i + 1] = _matrix->matrixGet()[i][2];
-        }
-        if (i != 0) {
-            L->matrixGet()[i][i - 1] = _matrix->matrixGet()[i][0];
-        }
-    }
-    Matrix* Q = Matrix::matrixSum(D, L);
-    Matrix* Q1 = inverseMatrix(Q);
-    Matrix* Q2 = Matrix::matrixConstComp(U, -1.0);
-    Matrix* C = Matrix::matrixComp(Q1, Q2);
-    delete Q;
-    delete Q1;
-    delete Q2;
-    delete E;
-    delete D;
-    delete U;
-    delete L;
-    return C;
+	int cols = _matrix->colsGet();
+	int rows = _matrix->rowsGet();
+	Matrix* Q = new Matrix;
+	Matrix* D = new Matrix;
+	D->matrixNullSet(rows, rows);
+	Matrix* L = new Matrix;
+	L->matrixNullSet(rows, rows);
+	Matrix* U = new Matrix;
+	U->matrixNullSet(rows, rows);
+	Matrix* E = new Matrix;
+	E->matrixOneSet(rows, rows);
+	for (int i = 0; i < rows; ++i) {
+		D->matrixGet()[i][i] = _matrix->matrixGet()[i][1];
+		if (i != rows - 1) {
+			U->matrixGet()[i][i + 1] = _matrix->matrixGet()[i][2];
+		}
+		if (i != 0) {
+			L->matrixGet()[i][i - 1] = _matrix->matrixGet()[i][0];
+		}
+	}
+	Q = Matrix::matrixSum(D,L);
+	Q = inverseMatrix(Q);
+	Q = Matrix::matrixConstComp(Q, -1);
+	Q = Matrix::matrixComp(Q,U);
+	//Q = -(A - U) ^ -1 * U;
+	return(Q);
 }
 
 Matrix* Seidel(const Matrix* _matrix) {
     int cols = _matrix->colsGet();
     int rows = _matrix->rowsGet();
-    type eps = 0.00001;
+    type eps = 1e-7;
     Matrix* result = new Matrix;
     result->matrixNullSet(rows, 1);
     for (int i = 0; i < rows; ++i) {  // Reading of right part of equation
@@ -682,6 +682,8 @@ Matrix* Seidel(const Matrix* _matrix) {
     Matrix* C = CSeidel(_matrix);
     type normC = normInf(C);
     cout << "Norm C = " << normC << endl;
+    cout << "Norm CU = " << CUNorm(C) << endl;
+    cout << "Norm CL = " << CLNorm(C) << endl;
     do {
         iteration++;
         prevX = Matrix::getCopy(result);
@@ -704,5 +706,31 @@ Matrix* Seidel(const Matrix* _matrix) {
 type pogrNorm(Matrix* _solution, Matrix* _realSolution){
     Matrix* pogr = Matrix::matrixDiff(_solution, _realSolution);
     type norm = normInfVect(pogr);
+    return norm;
+}
+
+type CLNorm(Matrix* _C) {
+    int rows = _C->rowsGet();
+    Matrix* tmp = Matrix::getCopy(_C);
+    for (int i = 0; i < rows; ++i) {
+        for (int j = i; j < rows; ++j) {
+            tmp->matrixGet()[i][j] = 0.0;
+        }
+    }
+    type norm = normInf(tmp);
+    delete tmp;
+    return norm;
+}
+
+type CUNorm(Matrix* _C) {
+    int rows = _C->rowsGet();
+    Matrix* tmp = Matrix::getCopy(_C);
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < i + 1; ++j) {
+            tmp->matrixGet()[i][j] = 0.0;
+        }
+    }
+    type norm = normInf(tmp);
+    delete tmp;
     return norm;
 }
