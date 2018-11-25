@@ -12,8 +12,8 @@ int main() {
     double rightBorder = 1.0;
     int numberOfParts = 10;
     double* uniformMesh = Mesh(leftBorder, rightBorder, numberOfParts);
-    double** functionValues = func1(uniformMesh, numberOfParts);
-    double* functionMesh = Mesh(leftBorder, rightBorder, numberOfParts * 10);
+    double** functionValues = func2(uniformMesh, numberOfParts);
+    double* functionMesh = MeshCheb(leftBorder, rightBorder, numberOfParts * 10);
     double** polynom = Polynom(functionValues, functionMesh, numberOfParts, numberOfParts * 10);
     Extracttofile(polynom, numberOfParts * 10, path);
     return 0;

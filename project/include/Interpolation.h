@@ -24,6 +24,9 @@ double* MeshCheb(double a, double b, int n);
 
 // Functions
 double** func1(double* M, int n);  // M - argument for function
+double** func2(double* M, int n);
+double** func3(double* M, int n);
+double** func4(double* M, int n);
 
 // Interpolation methods
 double** Polynom(double** S,double* R,int n, int m);  // n - size of mesh S, m - size of mesh R
