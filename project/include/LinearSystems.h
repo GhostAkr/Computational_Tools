@@ -18,6 +18,7 @@ Matrix* Jacobi(const Matrix* _matrix);
 Matrix* SOR(const Matrix* _matrix);
 Matrix* Seidel(const Matrix* _matrix);
 Matrix* C_Seidel(const Matrix* _matrix);
+Matrix* tridiagonalLinearSolve(const Matrix* _matrix);
 
 // Other methods
 

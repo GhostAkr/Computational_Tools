@@ -734,3 +734,35 @@ type CUNorm(Matrix* _C) {
     delete tmp;
     return norm;
 }
+
+Matrix* tridiagonalLinearSolve(const Matrix* _matrix) {
+    int rows = _matrix->rowsGet();
+    auto* a = new double [rows - 1];
+    auto* b = new double [rows - 1];
+    a[0] = -_matrix->matrixGet()[0][1] / _matrix->matrixGet()[0][2];
+    b[0] = _matrix->matrixGet()[0][3] / _matrix->matrixGet()[0][2];
+    Matrix* result = new Matrix;
+    result->matrixNullSet(rows, 1);
+    for (int i = 1; i < rows - 1; ++i) {
+        double A = _matrix->matrixGet()[i - 1][0];
+        double C = _matrix->matrixGet()[i - 1][1];
+        double B = _matrix->matrixGet()[i - 1][2];
+        double F = _matrix->matrixGet()[i - 1][3];
+        a[i] = -B / (A * a[i - 1] + C);
+        b[i] = (F - A * b[i - 1]) / (A * a[i - 1] + C);
+    }
+    double F = _matrix->matrixGet()[rows - 1][3];
+    double A = _matrix->matrixGet()[rows - 1][0];
+    double C = _matrix->matrixGet()[rows - 1][1];
+    cout << "F = " << F << endl;
+    cout << "A = " << A << endl;
+    cout << "C = " << C << endl;
+    result->matrixGet()[rows - 1][0] = (F - A * b[rows - 2]) / (A * a[rows - 2] + C);
+    cout << "Last element in solution is " << result->matrixGet()[rows - 1][0] << endl;
+    for (int i = rows - 2; i >= 0; --i) {
+        result->matrixGet()[i][0] = a[i + 1] * result->matrixGet()[i + 1][0] + b[i + 1];
+    }
+    delete[] a;
+    delete[] b;
+    return result;
+}
