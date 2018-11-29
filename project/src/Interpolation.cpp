@@ -119,6 +119,16 @@ double** func5(double* M, int n) {
     return(S);
 }
 
+double** funcexp(double* M, int n) {
+    double** S = new double*[2];
+    S[0] = M;
+    S[1] = new double[n];
+    for (int i = 0; i < n; i++) {
+        S[1][i] = exp(S[0][i]);
+    }
+    return(S);
+}
+
 // Interpolation methods
 
 double** Polynom(double** S, double* R, int n, int m) {
@@ -217,4 +227,23 @@ void Extracttofile(double** P, int m, std::string _pathToFile) {
         fileOut << P[0][i] << " " << P[1][i] << endl;
     }
     fileOut.close();
+}
+
+double max(double* M, int n) {
+    double res = fabs(M[0]);
+    for (int i = 1; i < n; i++) {
+        if (fabs(M[i]) > res) {
+            res = fabs(M[i]);
+        }
+    }
+    return res;
+}
+
+double pogr(double** P, int n) {
+    double* pogr = new double[n];
+    double** justf = func3(P[0], n);
+    for (int i = 0; i < n; i++) {
+        pogr[i] = fabs(P[1][i] - justf[1][i]);
+    }
+    return max(pogr, n);
 }

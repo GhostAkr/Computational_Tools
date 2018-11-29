@@ -29,6 +29,7 @@ double** func2(double* M, int n);
 double** func3(double* M, int n);
 double** func4(double* M, int n);
 double** func5(double* M, int n);
+double** funcexp(double* M, int n);
 
 // Interpolation methods
 double** Polynom(double** S, double* R, int n, int m);  // n - size of mesh S, m - size of mesh R
@@ -36,5 +37,7 @@ double** Spline(double** S, double* R, int n, int m);
 
 // Other methods
 void Extracttofile(double** P, int m, std::string _pathToFile);  // P - table of arguments and function values; m - dimension
+double max(double* M, int n);
+double pogr(double** P, int n);
 
 #endif //LAB_1_INTERPOLATION_H
