@@ -745,13 +745,18 @@ Matrix* tridiagonalLinearSolve(const Matrix* _matrix) {
     Matrix* result = new Matrix;
     result->matrixNullSet(rows, 1);
     for (int i = 1; i < rows - 1; ++i) {
-        double A = _matrix->matrixGet()[i - 1][0];
-        double C = _matrix->matrixGet()[i - 1][1];
-        double B = _matrix->matrixGet()[i - 1][2];
-        double F = _matrix->matrixGet()[i - 1][3];
+        double A = _matrix->matrixGet()[i][0];
+        double C = _matrix->matrixGet()[i][1];
+        double B = _matrix->matrixGet()[i][2];
+        double F = _matrix->matrixGet()[i][3];
         a[i] = -B / (A * a[i - 1] + C);
         b[i] = (F - A * b[i - 1]) / (A * a[i - 1] + C);
     }
+//    cout << "Alpha is" << endl;
+//    for (int i = 0; i < rows - 1; ++i) {
+//        cout << a[i] << endl;
+//    }
+//    cout << endl;
     double F = _matrix->matrixGet()[rows - 1][3];
     double A = _matrix->matrixGet()[rows - 1][0];
     double C = _matrix->matrixGet()[rows - 1][1];
@@ -761,7 +766,7 @@ Matrix* tridiagonalLinearSolve(const Matrix* _matrix) {
     }
     delete[] a;
     delete[] b;
-    cout << "Result is " << endl;
-    result->matrixPrint();
+//    cout << "Result is " << endl;
+//    result->matrixPrint();
     return result;
 }

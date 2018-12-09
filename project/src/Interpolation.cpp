@@ -139,6 +139,16 @@ double** func6(double* M, int n) {
     return(S);
 }
 
+double** func7(double* M, int n) {
+    double** S = new double*[2];
+    S[0] = M;
+    S[1] = new double[n];
+    for (int i = 0; i < n; i++) {
+        S[1][i] = S[0][i] * S[0][i] * S[0][i] + S[0][i] * S[0][i] + S[0][i] + 1;
+    }
+    return(S);
+}
+
 // Interpolation methods
 
 double** Polynom(double** S, double* R, int n, int m) {
@@ -165,6 +175,8 @@ double** Polynom(double** S, double* R, int n, int m) {
 
 double** Spline(double** S, double* R, int n, int m) {
     n++;
+    m++;
+    cout << "Number of variables is " << n << endl;
     auto** P = new double* [2];
     P[0] = R;
     P[1] = new double [m];
@@ -174,12 +186,18 @@ double** Spline(double** S, double* R, int n, int m) {
     for (int i = 0; i < n - 1; ++i) {
         A[i] = S[1][i];
     }
+    cout << "A coeffs are" << endl;
+    Print(A, n - 1);
     auto* H = new double [n - 1];
     auto* G = new double [n - 1];
     for (int i = 1; i < n; ++i) {
         H[i - 1] = S[0][i] - S[0][i - 1];
         G[i - 1] = (S[1][i] - S[1][i - 1]) / H[i - 1];
     }
+    cout << "G array is" << endl;
+    Print(G, n - 1);
+    cout << "H array is " << endl;
+    Print(H, n - 1);
     for (int i = 0; i < n - 2; ++i) {
         if (i == 0) {
             triDiagC->matrixGet()[i][0] = 0.0;
@@ -194,23 +212,38 @@ double** Spline(double** S, double* R, int n, int m) {
         }
         triDiagC->matrixGet()[i][3] = 3.0 * (G[i + 1] - G[i]);
     }
+    cout << "Diagonal matrix is" << endl;
+    triDiagC->matrixPrint();
     Matrix* CSolve = tridiagonalLinearSolve(triDiagC);
-    auto* C = new double [n - 1];  // Real coefficients for spline
-    for (int i = 0; i < n - 1; ++i) {
+    //cout << "Result with Seidel is" << endl;
+    //Matrix* CSolve = Seidel(triDiagC);
+    cout << "Result is " << endl;
+    CSolve->matrixPrint();
+    //alt->matrixPrint();
+    auto* C = new double [n];  // Real coefficients for spline
+    for (int i = 0; i < n; ++i) {
         if (i == 0) {
+            C[i] = 0.0;
+        } else if (i == n - 1) {
             C[i] = 0.0;
         } else {
             C[i] = CSolve->matrixGet()[i - 1][0];
         }
     }
+    cout << "C coeffs are" << endl;
+    Print(C, n);
     auto* B = new double [n - 1];
     for (int i = 0; i < n - 1; ++i) {
         B[i] = G[i] - (C[i + 1] + 2.0 * C[i]) * H[i] / 3.0;
     }
+    cout << "B coeffs are" << endl;
+    Print(B, n - 1);
     auto* D = new double [n - 1];
     for (int i = 0; i < n - 1; ++i) {
         D[i] = (C[i + 1] - C[i]) / (3.0 * H[i]);
     }
+    cout << "D coeffs are" << endl;
+    Print(D, n - 1);
     // Building of spline
     int j = 0;  // Counter
     for (int k = 0; k < m; ++k) {
@@ -222,6 +255,7 @@ double** Spline(double** S, double* R, int n, int m) {
         double delta3 = delta2 * delta;
         P[1][k] = A[j] + B[j] * delta + C[j] * delta2 + D[j] * delta3;
     }
+    cout << "j = " << j << endl;
     return P;
 }
 
