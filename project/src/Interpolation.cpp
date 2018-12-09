@@ -129,6 +129,16 @@ double** funcexp(double* M, int n) {
     return(S);
 }
 
+double** func6(double* M, int n) {
+    double** S = new double*[2];
+    S[0] = M;
+    S[1] = new double[n];
+    for (int i = 0; i < n; i++) {
+        S[1][i] = S[0][i] * S[0][i] * S[0][i];
+    }
+    return(S);
+}
+
 // Interpolation methods
 
 double** Polynom(double** S, double* R, int n, int m) {
@@ -241,7 +251,7 @@ double max(double* M, int n) {
 
 double pogr(double** P, int n) {
     double* pogr = new double[n];
-    double** justf = func3(P[0], n);
+    double** justf = funcexp(P[0], n);
     for (int i = 0; i < n; i++) {
         pogr[i] = fabs(P[1][i] - justf[1][i]);
     }
