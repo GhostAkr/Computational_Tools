@@ -284,8 +284,9 @@ double max(double* M, int n) {
 }
 
 double pogr(double** P, int n) {
+    n++;
     double* pogr = new double[n];
-    double** justf = funcexp(P[0], n);
+    double** justf = func2(P[0], n);
     for (int i = 0; i < n; i++) {
         pogr[i] = fabs(P[1][i] - justf[1][i]);
     }

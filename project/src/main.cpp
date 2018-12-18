@@ -11,8 +11,8 @@ int main() {
     std::string path = "../data/SUPERTEST.txt";
     double leftBorder = -1.0;
     double rightBorder = 1.0;
-    int numberOfParts = 2;
-    int split = 2;
+    int numberOfParts = 160;
+    int split = 3;
     int numberOfX = numberOfParts * split;
 
     //// Choosing of mesh
@@ -24,14 +24,14 @@ int main() {
     Print(uniformMesh, numberOfParts + 1);
     cout << "Calculating mesh" << endl;
     Print(functionMesh, numberOfX + 1);
-    double** functionValues = func1(uniformMesh, numberOfParts + 1);
+    double** functionValues = func2(uniformMesh, numberOfParts + 1);
     //double* qw = new double[1];
     //qw[0] = 2.2;
     //// Choosing of way to interpolate
     double** interpolant = Spline(functionValues, functionMesh, numberOfParts, numberOfX);
     //double** interpolant = Polynom(functionValues, qw, numberOfParts, 1);
     //double** interpolant = Polynom(functionValues,functionMesh,numberOfParts,numberOfX);
-    //cout<<printf("%.9f",interpolant[1][0] - exp(2.2))<<endl;
+    cout << "Error = " << pogr(interpolant, numberOfX);
     //// Output
     //Print(interpolant, numberOfX);
     Extracttofile(interpolant, numberOfX + 1, path);
