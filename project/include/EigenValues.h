@@ -13,9 +13,8 @@
 using std::cout;
 using std::endl;
 
-Matrix* HessenbergForm(const Matrix* _A);
+Matrix* HessenbergForm(Matrix* _A);
 Matrix* QRDecompositionEigen(Matrix* _A);
-
-void shiftMatrix(Matrix* _A, double _shift);  // _A +=_shift * IdentityMatrix
-
+Matrix* Reverse(Matrix* _A);
+double Rayleigh(Matrix* _A);
 #endif //LAB_1_EIGENVALUES_H
