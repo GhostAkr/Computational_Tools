@@ -120,7 +120,7 @@ Matrix* Reverse(Matrix* _A) {
     }
     QRDecompositionSolve(M,Q,R);
 
-    cout << endl;
+    //cout << endl;
     int n = 0;
     while (n < 6) {
         //Q->matrixPrint();
@@ -134,7 +134,7 @@ Matrix* Reverse(Matrix* _A) {
         //res->matrixPrint();
         //cout << endl;
         t = QRBackTurn(Q,R,res);
-        t->matrixPrint();
+        //t->matrixPrint();
         Q->matrixTranspose();
         //t->matrixPrint();
         //cout << endl;
@@ -147,8 +147,8 @@ Matrix* Reverse(Matrix* _A) {
         for (int i = 0; i < rows; i++) {
             res->matrixGet()[i][0] /= div;
         }
-        res->matrixPrint();
-        cout << endl;
+        //res->matrixPrint();
+        //cout << endl;
         n++;
     }
 
@@ -186,7 +186,7 @@ double Rayleigh(Matrix* _A) {
         M = Matrix::getCopy(_A);
         eigen =0;
         M1 = Matrix::matrixComp(_A, res);
-        cout << endl;
+        //cout << endl;
         for (int i = 0; i < rows; i++) {
             eigen += M1->matrixGet()[i][0] * res->matrixGet()[i][0];
         }
@@ -198,10 +198,10 @@ double Rayleigh(Matrix* _A) {
         }
 
         temp = Matrix::getCopy(M);
-        temp->matrixPrint();
+        //temp->matrixPrint();
         res = gaussLinearSolve(temp);
-        res->matrixPrint();
-        cout << endl << eigen << endl;
+        //res->matrixPrint();
+        //cout << endl << eigen << endl;
         double div = norm(res);
         for (int i = 0; i < rows; i++) {
             res->matrixGet()[i][0] /= div;

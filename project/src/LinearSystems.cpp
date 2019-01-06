@@ -29,8 +29,6 @@ Matrix* gaussLinearSolve(Matrix* _A) {
         cout << "Linear system has infinite number of solutions or hasn't it at all" << endl;
         return NULL;
     }
-    cout << "Triangle form is " << endl;
-    _A->matrixPrint();
     // Second part
     Matrix* result = new Matrix;
     result->matrixNullSet(rowsA, 1);

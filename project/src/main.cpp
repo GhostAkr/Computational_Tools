@@ -19,7 +19,12 @@ int main() {
     cout << "Hessenberg is" << endl;
     HesA->matrixPrint();
     Matrix* Result = QRDecompositionEigen(HesA);
-    cout << "Eigen values are " << endl;
+    cout << "Eigenvalues are " << endl;
     Result->matrixPrint();
+    double res = Rayleigh(A);
+    cout << "Rayleigh quotient = " << res << endl;
+    Matrix* r = Reverse(A);
+    cout << "Eigenvectors are " << endl;
+    r->matrixPrint();
     return 0;
 }
