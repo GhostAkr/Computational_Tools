@@ -93,3 +93,120 @@ void shiftMatrix(Matrix* _A, double _shift) {
         _A->matrixGet()[i][i] += _shift;
     }
 }
+
+Matrix* Reverse(Matrix* _A) {
+    double eigen = 1;
+    int rows = _A->rowsGet();
+    Matrix* res = new Matrix;
+    Matrix* Q = new Matrix;
+    Matrix* R = new Matrix;
+    Matrix* t = new Matrix;
+    Matrix* M = new Matrix;
+    t->matrixNullSet(rows, 1);
+    res->matrixNullSet(rows,1);
+    M->matrixNullSet(rows, rows);
+    //for (int i = 0; i < rows; i++) {
+    //	res->matrixGet()[i][0] = 1;
+    //}
+    res->matrixGet()[0][0] = 1;
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < rows; j++) {
+            M->matrixGet()[i][j] = _A->matrixGet()[i][j];
+            if (i == j) {
+                M->matrixGet()[i][j] -= eigen;
+            }
+        }
+    }
+    QRDecompositionSolve(M,Q,R);
+
+    cout << endl;
+    int n = 0;
+    while (n < 6) {
+        //Q->matrixPrint();
+        //for (int i = 0; i < rows; i++) {
+        //	M->matrixGet()[i][rows] = res->matrixGet()[i][0];
+        //}
+
+        //temp = Matrix::getCopy(M);
+        //temp->matrixPrint();
+        //res = gaussLinearSolve(temp);
+        //res->matrixPrint();
+        //cout << endl;
+        t = QRBackTurn(Q,R,res);
+        t->matrixPrint();
+        Q->matrixTranspose();
+        //t->matrixPrint();
+        //cout << endl;
+        //res->matrixPrint();
+        //cout << endl;
+        res = Matrix::getCopy(t);
+        //res->matrixPrint();
+        //cout << endl;
+        double div = norm(res);
+        for (int i = 0; i < rows; i++) {
+            res->matrixGet()[i][0] /= div;
+        }
+        res->matrixPrint();
+        cout << endl;
+        n++;
+    }
+
+
+    //Matrix::matrixComp(_A, res)->matrixPrint();
+    //cout << endl;
+    return res;
+}
+
+double Rayleigh(Matrix* _A) {
+    double eigen = 0;
+    int rows = _A->rowsGet();
+    Matrix* res = new Matrix;
+    Matrix* temp = new Matrix;
+    Matrix* M1 = new Matrix;
+    Matrix* M = new Matrix;
+    M->matrixNullSet(rows,rows + 1);
+    //for (int i = 0; i < rows; i++) {
+    //	for (int j = 0; j < rows; j++) {
+    //		M->matrixGet()[i][j] = _A->matrixGet()[i][j];
+    //	}
+    //}
+    M = Matrix::getCopy(_A);
+    temp->matrixNullSet(rows, rows + 1);
+    res->matrixNullSet(rows, 1);
+    int n = 0;
+
+    res->matrixGet()[0][0] = -0.87;
+    res->matrixGet()[1][0] = 0;
+    res->matrixGet()[2][0] = -0.25;
+    res->matrixGet()[3][0] = -0.43;
+
+
+    while(n<3) {
+        M = Matrix::getCopy(_A);
+        eigen =0;
+        M1 = Matrix::matrixComp(_A, res);
+        cout << endl;
+        for (int i = 0; i < rows; i++) {
+            eigen += M1->matrixGet()[i][0] * res->matrixGet()[i][0];
+        }
+        for (int i = 0; i < rows; i++) {
+            M->matrixGet()[i][i] -= eigen;
+        }
+        for (int i = 0; i < rows; i++) {
+            M->matrixGet()[i][rows] = res->matrixGet()[i][0];
+        }
+
+        temp = Matrix::getCopy(M);
+        temp->matrixPrint();
+        res = gaussLinearSolve(temp);
+        res->matrixPrint();
+        cout << endl << eigen << endl;
+        double div = norm(res);
+        for (int i = 0; i < rows; i++) {
+            res->matrixGet()[i][0] /= div;
+        }
+        n++;
+    }
+    return eigen;
+}

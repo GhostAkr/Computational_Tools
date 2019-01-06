@@ -232,6 +232,15 @@ type vectorNorm(type* _vector, size_t _rows) {
     return norm;
 }
 
+type norm(Matrix* _A) {
+    type norm = 0.0;
+    double rows = _A->rowsGet();
+    for (int i = 0; i < rows; ++i) {
+        norm += _A->matrixGet()[i][0] * _A->matrixGet()[i][0];
+    }
+    return sqrt(norm);
+}
+
 void conditionNumber(Matrix* _A) {
     size_t rowsA = _A->rowsGet();
     size_t colsA = _A->colsGet();
