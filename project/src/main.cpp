@@ -4,19 +4,22 @@
 #include "../include/Interpolation.h"
 #include "../include/EigenValues.h"
 
+//#include "../src/EigenvaluesProblem.cpp"
+
 using std::cout;
 using std::endl;
 
 int main() {
-	string path = "C:/Users/User/Desktop/Новая папка (3)/Computational Tools (VS)/Computational Tools/data/EigenTest.txt";
-	Matrix* A = new Matrix;
-	A->readMatrixFromFile(path);
-	A->matrixPrint();
-	double res = Rayleigh(A);
-	cout << res << endl;
-	//Matrix* r = new Matrix;
-	//r = Reverse(A);
-	//r->matrixPrint();
-	system("pause");
+    std::string path = "../data/EigenTest.txt";
+    Matrix* A = new Matrix;
+    A->readMatrixFromFile(path);
+    cout << "Matrix A is " << endl;
+    A->matrixPrint();
+    Matrix* HesA = HessenbergForm(A);
+    cout << "Hessenberg is" << endl;
+    HesA->matrixPrint();
+    Matrix* Result = QRDecompositionEigen(HesA);
+    cout << "Eigen values are " << endl;
+    Result->matrixPrint();
     return 0;
 }

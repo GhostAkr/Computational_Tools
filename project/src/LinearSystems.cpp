@@ -321,15 +321,6 @@ type normOneVect(Matrix* _A) {
     return sum;
 }
 
-type norm(Matrix* _A) {
-	type norm = 0.0;
-	double rows = _A->rowsGet();
-	for (int i = 0; i < rows; ++i) {
-		norm += _A->matrixGet()[i][0] * _A->matrixGet()[i][0];
-	}
-	return sqrt(norm);
-}
-
 Matrix* rotateMatrix(Matrix* _targetMatrix, int _line, int _numOfVar, type _c, type _s) {
 	// Calculting coefficients
 	for (int k = 0; k < _targetMatrix->colsGet(); ++k) {

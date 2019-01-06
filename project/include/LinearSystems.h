@@ -32,7 +32,6 @@ type normInf(Matrix* _A);
 type normOne(Matrix* _A);
 type normInfVect(Matrix* _A);
 type normOneVect(Matrix* _A);
-type norm(Matrix* _A);
 Matrix* createTridiagonalMatrix(int variant);
 Matrix* C_SOR(Matrix* _matrix, type omega);  // Creating of C-Matrix for SOR method with linear system _matrixMatrix* Seidel(const Matrix* _matrix);
 Matrix* CSeidel(const Matrix* _matrix);
