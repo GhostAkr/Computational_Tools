@@ -59,6 +59,9 @@ bool onlyDesitionCheck(Matrix* _matrix) {
     for (int i = 0; i < _matrix->rowsGet(); ++i) {
         comp *= _matrix->matrixGet()[i][i];
     }
+//    cout << "matrix is" << endl;
+//    _matrix->matrixPrint();
+//    cout << "comp = " << comp << endl;
     if (fabs(comp) < eps) {  // if (comp == 0.0)
         return false;
     } else {
@@ -110,21 +113,22 @@ Matrix* rotationMatrix(Matrix* _matrix, int line, int numOfVar) {
     return result;
 }
 
-Matrix* QRDecompositionSolve(Matrix* _A, Matrix* Q, Matrix* R) {
+Matrix* QRDecompositionSolve(Matrix* _A, Matrix* Q, Matrix* R) {  /// This algorithm was changed for QREigen method
     size_t rows = _A->rowsGet();
     size_t cols = _A->colsGet();
     Matrix* rotResultMatrix = new Matrix;
     rotResultMatrix->matrixOneSet(rows, rows);
 	type eps = 0.0;  // For comparing with 0.0
-	if (sizeof(type) == 4) {
+	if (sizeof(type) == 4) {  /// Features for Laboratory work (eps = 1e-14 for double type)
 		eps = 1e-9;
 	}
 	else {
 		eps = 1e-14;
 	}
     for (int j = 0; j < rows - 1; ++j) {
-        int mainElem = _A->mainElement(j);
-        _A->matrixRowsChange(j, mainElem);
+        /// Changing of rows based on finding of main element was commented for QREigen method
+        //int mainElem = _A->mainElement(j);
+        //_A->matrixRowsChange(j, mainElem);
         for (int i = j + 1; i < rows; ++i) {
 			type a1 = _A->matrixGet()[j][j];  // Temporary variable
 			type a2 = _A->matrixGet()[i][j];  // Temporary variable
@@ -136,10 +140,11 @@ Matrix* QRDecompositionSolve(Matrix* _A, Matrix* Q, Matrix* R) {
 			_A->matrixGet()[i][j] = 0.0;
         }
     }
-    if (!onlyDesitionCheck(_A)) {
-        cout << "Linear system has infinite number of solutions or hasn't it at all" << endl;
-        return NULL;
-    }
+    /// Checking for singular matrix was commented for QREigen method
+//    if (!onlyDesitionCheck(_A)) {
+//        cout << "Linear system has infinite number of solutions or hasn't it at all" << endl;
+//        return NULL;
+//    }
     // Solving final equations
     Matrix* b = new Matrix;
     b->matrixNullSet(rows, 1);
@@ -167,7 +172,10 @@ Matrix* QRDecompositionSolve(Matrix* _A, Matrix* Q, Matrix* R) {
         }
     }
     rotResultMatrix->matrixTranspose();
-    //cout << "Q-Matrix is" << endl;
+    for(int i = 0; i < rows; ++i) {  /// Changes were made for QREigen method
+        rotResultMatrix->matrixGet()[i][rows - 1] *= -1;
+    }
+    _A->matrixGet()[rows - 1][rows - 1] *= -1;  /// Changes were made for QREigen method
     Q->matrixNullSet(rows, rows);
     R->matrixNullSet(rows, rows);
     for (int i = 0; i < rows; ++i) {
@@ -176,17 +184,6 @@ Matrix* QRDecompositionSolve(Matrix* _A, Matrix* Q, Matrix* R) {
             R->matrixGet()[i][j] = _A->matrixGet()[i][j];
         }
     }
-    //cout << "A from QR is" << endl;
-    //
-    // _A->matrixPrint();
-    //rotResultMatrix->matrixPrint();
-//    cout << "R-Matrix is" << endl;
-//    for (int i = 0; i < rows; ++i) {
-//        for (int j = 0; j < rows; ++j) {
-//            cout << _A->matrixGet()[i][j] << " ";
-//        }
-//        cout << endl;
-//    }
     delete tmp;
     delete rotResultMatrix;
     delete b;
