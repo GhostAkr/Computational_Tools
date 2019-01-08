@@ -18,13 +18,16 @@ int main() {
     Matrix* HesA = HessenbergForm(A);
     cout << "Hessenberg is" << endl;
     HesA->matrixPrint();
-    Matrix* Result = QRDecompositionEigen(HesA);
+    Matrix* Vals = QRDecompositionEigen(HesA);
     cout << "Eigenvalues are " << endl;
-    Result->matrixPrint();
+    Vals->matrixPrint();
     double res = Rayleigh(A);
     cout << "Rayleigh quotient = " << res << endl;
-    Matrix* r = Reverse(A);
-    cout << "Eigenvectors are " << endl;
-    r->matrixPrint();
+    for (int i = 0; i < Vals->rowsGet(); ++i) {
+        double eigenvalue = Vals->matrixGet()[i][0];
+        Matrix* r = Reverse(A, eigenvalue);
+        cout << "Eigenvector for eigenvalue = " << eigenvalue << " is" << endl;
+        r->matrixPrint();
+    }
     return 0;
 }

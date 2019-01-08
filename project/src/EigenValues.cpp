@@ -94,22 +94,22 @@ void shiftMatrix(Matrix* _A, double _shift) {
     }
 }
 
-Matrix* Reverse(Matrix* _A) {
-    double eigen = 1;
+Matrix* Reverse(Matrix* _A, double eigen) {
+    double eps = 1e-3;
     int rows = _A->rowsGet();
     Matrix* res = new Matrix;
     Matrix* Q = new Matrix;
     Matrix* R = new Matrix;
-    Matrix* t = new Matrix;
     Matrix* M = new Matrix;
-    t->matrixNullSet(rows, 1);
     res->matrixNullSet(rows,1);
     M->matrixNullSet(rows, rows);
-    //for (int i = 0; i < rows; i++) {
-    //	res->matrixGet()[i][0] = 1;
-    //}
-    res->matrixGet()[0][0] = 1;
-
+    for (int i = 0; i < rows; i++) {
+    	res->matrixGet()[i][0] = 1.0;
+    }
+    double div = norm(res);
+    for (int i = 0; i < rows; i++) {
+        res->matrixGet()[i][0] /= div;
+    }
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < rows; j++) {
             M->matrixGet()[i][j] = _A->matrixGet()[i][j];
@@ -119,42 +119,21 @@ Matrix* Reverse(Matrix* _A) {
         }
     }
     QRDecompositionSolve(M,Q,R);
-
-    //cout << endl;
     int n = 0;
-    while (n < 6) {
-        //Q->matrixPrint();
-        //for (int i = 0; i < rows; i++) {
-        //	M->matrixGet()[i][rows] = res->matrixGet()[i][0];
-        //}
-
-        //temp = Matrix::getCopy(M);
-        //temp->matrixPrint();
-        //res = gaussLinearSolve(temp);
-        //res->matrixPrint();
-        //cout << endl;
-        t = QRBackTurn(Q,R,res);
-        //t->matrixPrint();
-        Q->matrixTranspose();
-        //t->matrixPrint();
-        //cout << endl;
-        //res->matrixPrint();
-        //cout << endl;
+    Matrix* prev = new Matrix;
+    do {
+        n++;
+        prev = Matrix::getCopy(res);
+        Matrix* t = QRBackTurn(Q,R,res);
         res = Matrix::getCopy(t);
-        //res->matrixPrint();
-        //cout << endl;
+        Q->matrixTranspose();
         double div = norm(res);
         for (int i = 0; i < rows; i++) {
             res->matrixGet()[i][0] /= div;
         }
-        //res->matrixPrint();
-        //cout << endl;
-        n++;
-    }
-
-
-    //Matrix::matrixComp(_A, res)->matrixPrint();
-    //cout << endl;
+    } while (1.0 - fabs(cosinus(res, prev)) >= eps);
+    delete prev;
+    cout << "Number of iterations is " << n << endl;
     return res;
 }
 
@@ -210,3 +189,29 @@ double Rayleigh(Matrix* _A) {
     }
     return eigen;
 }
+
+double cosinus(Matrix* vec1, Matrix* vec2) {
+    if ((vec1->rowsGet() != vec2->rowsGet()) || (vec1->colsGet() != 1) || (vec2->colsGet() != 1)) {
+        cout << "Vectors are incorrect" << endl;
+        return -1.0;
+    }
+    double res = 1.0;
+    res *= scalarProd(vec1, vec2);
+    res /= norm(vec1);
+    res /= norm(vec2);
+    return res;
+}
+
+double scalarProd(Matrix* vec1, Matrix* vec2) {
+    if ((vec1->rowsGet() != vec2->rowsGet()) || (vec1->colsGet() != 1) || (vec2->colsGet() != 1)) {
+        cout << "Vectors are incorrect" << endl;
+        return -1.0;
+    }
+    int rows = vec1->rowsGet();
+    double sum = 0.0;
+    for (int i = 0; i < rows; ++i) {
+        sum += vec1->matrixGet()[i][0] * vec2->matrixGet()[i][0];
+    }
+    return sum;
+}
+
