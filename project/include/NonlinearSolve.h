@@ -13,7 +13,7 @@ using std::cout;
 using std::endl;
 
 // TODO: finish localization of roots
-//double* rootsLocale(double* _mesh);
+double** rootsLocale(double* _funcMesh, int n, int* nOfPairs);  // n - size of mesh, nOfPairs - number of points in pairs
 
 // TODO: write rest tests
 // Functions
