@@ -13,12 +13,12 @@ using std::cout;
 using std::endl;
 
 // TODO: finish localization of roots
-double** rootsLocale(double* _funcMesh, int n, int* nOfPairs);  // n - size of mesh, nOfPairs - number of points in pairs
+double** rootsLocale(double** _funcMesh, int n, int* nOfPairs);  // n - size of mesh, nOfPairs - number of points in pairs
 
 // TODO: write rest tests
 // Functions
-double f1(double x);
-double f2(double x);
-double f3(double x);
+double** f1(double* x, int n);
+double** f2(double* x, int n);
+double** f3(double* x, int n);
 
 #endif //LAB_1_NONLINEARSOLVE_H
