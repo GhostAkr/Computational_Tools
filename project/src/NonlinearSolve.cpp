@@ -36,6 +36,10 @@ double** f3(double* x, int n) {
     return S;
 }
 
+double ff1(double x) {
+    return (x - 0.1) * (x - 0.22) * (x - 0.55) * (x - 0.7) * (x - 0.75)
+}
+
 double** rootsLocale(double** _funcMesh, int n, int* nOfPairs) {
     double eps = 1e-14;
     auto** tmp = new double* [2];  // Temporary array to save correct points and values
@@ -66,4 +70,39 @@ double** rootsLocale(double** _funcMesh, int n, int* nOfPairs) {
     }
     delete [] tmp;
     return res;
+}
+
+double* Bisection(double** _intervals, int nOfPairs, int* _nOfRoots) {
+    auto* result = new double [nOfPairs];
+    double nullEps = 1e-14;
+    double eps = 1e-5;
+    int numbeOfRoots = 0;
+    for (int i = 0; i < nOfPairs; i += 2) {
+        double a = _intervals[0][i];
+        double b = _intervals[0][i + 1];
+        if (fabs(_intervals[1][i]) < nullEps) {
+            addRoot(result, a, _nOfRoots);
+        }
+        if (fabs(_intervals[1][i + 1]) < nullEps) {
+            addRoot(result, b, _nOfRoots);
+            continue;
+        }
+        double h = b - a;
+        while (fabs(h) > eps) {
+            double x = (a + b) / 2.0;
+            double f = ff1(x);  /// Change with different function
+        }
+    }
+    return result;
+}
+
+void addRoot(double* _targetArray, double _root, int* _arraySize) {
+    double eps = 1e-14;
+    // Searching if root is in the _targetArray already
+    for (int i = 0; i < *_arraySize; ++i) {
+        if (fabs(_targetArray[i] - _root) < eps) {
+            return;
+        }
+    }
+    _targetArray[++*_arraySize] = _root;
 }

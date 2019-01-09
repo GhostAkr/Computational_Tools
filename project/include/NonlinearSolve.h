@@ -12,13 +12,16 @@
 using std::cout;
 using std::endl;
 
-// TODO: finish localization of roots
 double** rootsLocale(double** _funcMesh, int n, int* nOfPairs);  // n - size of mesh, nOfPairs - number of points in pairs
+double* Bisection(double** _intervals, int nOfPairs, int* _nOfRoots);
+void addRoot(double* _targetArray, double _root, int* _arraySize);
 
 // TODO: write rest tests
 // Functions
 double** f1(double* x, int n);
 double** f2(double* x, int n);
 double** f3(double* x, int n);
+
+double ff1(double x);
 
 #endif //LAB_1_NONLINEARSOLVE_H
