@@ -13,12 +13,16 @@ int main() {
     double a = 0.0;  // Left border
     double b = 1.0;  // Right border
     double* mesh = Mesh(0, 1, numberOfIntervals);
-    cout << "Mesh" << endl;
-    Print(mesh, numberOfIntervals + 1);
-    double** funcMesh = f1(mesh, numberOfIntervals + 1);
+//    cout << "Mesh" << endl;
+//    Print(mesh, numberOfIntervals + 1);
+    double** funcMesh = f3(mesh, numberOfIntervals + 1);
     int* numOfPairs = new int;
     double** localMesh = rootsLocale(funcMesh, numberOfIntervals + 1, numOfPairs);
-    cout << "Correct points" << endl;
-    Print(localMesh, *numOfPairs);
+//    cout << "Correct points" << endl;
+//    Print(localMesh, *numOfPairs);
+    auto* numOfRoots = new int;
+    double* roots = Bisection(localMesh, *numOfPairs, numOfRoots, ff3);
+    cout << "Roots" << endl;
+    Print(roots, *numOfRoots);
     return 0;
 }
