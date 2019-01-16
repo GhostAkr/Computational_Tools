@@ -125,3 +125,61 @@ void addRoot(double* _targetArray, double _root, int* _arraySize) {
     }
     _targetArray[(*_arraySize)++] = _root;
 }
+
+double fd1(double x) {
+    return 5 * (0.024299 + x * (-0.30238 + x * (1.1907 + (-1.856 + x)*x)));
+}
+
+double fd2(double x) {
+    return 1 / (2 * (sqrt(1 + x)));
+}
+
+double fd3(double x) {
+    return 105 * x*x - 134 * x - 3;
+}
+
+double* Newton(double** _intervals, int nOfPairs, int* _nOfRoots, double f(double)) {
+    auto* result = new double[nOfPairs];
+    double nullEps = 1e-14;
+    double eps = 1e-5;
+    double a, b, x1, x2, fa, fb, fd;
+    x1 = 0;
+    *_nOfRoots = 0;
+    for (int i = 0; i < nOfPairs; i += 2) {
+        a = _intervals[0][i];
+        b = _intervals[0][i + 1];
+        if ((fabs(_intervals[1][i]) < nullEps)||(fabs(_intervals[1][i + 1]) < nullEps)) {
+            if (fabs(_intervals[1][i]) < nullEps) {
+                addRoot(result, a, _nOfRoots);
+            }
+            if (fabs(_intervals[1][i + 1]) < nullEps) {
+                addRoot(result, b, _nOfRoots);
+
+            }
+            continue;
+        }
+        fa = f(a);
+        fb = f(b);
+        x2 = (fa*b - fb * a) / (fa - fb);
+        while (fabs(x1 - x2) >= eps) {
+            x1 = x2;
+            fd = (f(x1 + eps) - (x1)) / eps;
+            x2 = x1 - f(x1) / fd;
+
+        }
+        addRoot(result, x2, _nOfRoots);
+    }
+    return result;
+}
+
+//double** Newtonsys(double n) {
+//    double** res = new double*[2];
+//    double** mesh = new double*[2];
+//    mesh[0] = new double[n];
+//    mesh[1] = new double[n];
+//    double h = 20 / (n - 1);
+//    for (int i = 0; i < n; i++) {
+//        mesh[0][i] = -10 + h * i;
+//        mesh[1][i] = -10 + h * i;
+//    }
+//}

@@ -15,6 +15,8 @@ using std::endl;
 double** rootsLocale(double** _funcMesh, int n, int* nOfPairs);  // n - size of mesh, nOfPairs - number of points in pairs
 double* Bisection(double** _intervals, int nOfPairs, int* _nOfRoots, double f(double));
 void addRoot(double* _targetArray, double _root, int* _arraySize);
+double* Newton(double** _intervals, int nOfPairs, int* _nOfRoots, double f(double));
+double** Newtonsys(double n);
 
 // TODO: write rest tests
 // Functions

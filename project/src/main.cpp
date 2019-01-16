@@ -21,7 +21,7 @@ int main() {
 //    cout << "Correct points" << endl;
 //    Print(localMesh, *numOfPairs);
     auto* numOfRoots = new int;
-    double* roots = Bisection(localMesh, *numOfPairs, numOfRoots, ff3);
+    double* roots = Newton(localMesh, *numOfPairs, numOfRoots, ff3);
     cout << "Roots" << endl;
     Print(roots, *numOfRoots);
     return 0;
