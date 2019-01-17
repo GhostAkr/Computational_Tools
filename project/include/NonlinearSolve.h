@@ -30,6 +30,8 @@ double ff2(double x);
 double ff3(double x);
 
 double* fsys1(double* x);
+double* fsys2(double* x);
 double** f1jac(double* x);
+double** f2jac(double* x);
 
 #endif //LAB_1_NONLINEARSOLVE_H

@@ -199,10 +199,7 @@ double** Newtonsys(double n, std::string path, int* nroot) {
     double** res = new double*[2];
     res[0] = new double[1000];
     res[1] = new double[1000];
-
-    //int* nroot = new int;
     *nroot = 0;
-    //cout << "*nroot1 = " << *nroot << endl;
     double** mesh = new double*[2];
     double** Jac = new double*[2];
     double* x0 = new double[2];
@@ -217,8 +214,6 @@ double** Newtonsys(double n, std::string path, int* nroot) {
     if (!fileOut) {  // Exception
         cout << "Error while reading file" << endl;
     }
-
-
     mesh[0] = new double [nMesh];
     mesh[1] = new double [nMesh];
     double h = 20 / (n - 1);  //shag setki
@@ -226,7 +221,6 @@ double** Newtonsys(double n, std::string path, int* nroot) {
         mesh[0][i] = -10 + h * i;       //setka huetka
         mesh[1][i] = -10 + h * i;
     }
-
     fileOut << h << endl; //pishem shag
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
@@ -234,9 +228,9 @@ double** Newtonsys(double n, std::string path, int* nroot) {
             x0[1] = mesh[1][j];
             iteration = 0;
             do {              //cikl newton
-                Jac = f1jac(x0);
+                Jac = f2jac(x0);
                 div = 1 / (Jac[0][0] * Jac[1][1] - Jac[1][0] * Jac[0][1]);
-                f = fsys1(x0);
+                f = fsys2(x0);
                 x1[0] = x0[0] - div * (Jac[1][1] * f[0] - Jac[0][1] * f[1]);
                 x1[1] = x0[1] - div * (-Jac[1][0] * f[0] + Jac[0][0] * f[1]);
                 norm = sqrt((x1[0] - x0[0])*(x1[0] - x0[0]) + (x1[1] - x0[1])*(x1[1] - x0[1]));
@@ -259,6 +253,13 @@ double* fsys1(double* x) {
     return res;
 }
 
+double* fsys2(double* x) {
+    double* res = new double[2];
+    res[0] = x[0] * x[0] + x[1] * x[1] + x[0] + x[1] - 8;
+    res[1] = x[0] * x[0] + x[1] * x[1] + x[0] * x[1] - 7;
+    return res;
+}
+
 double** f1jac(double* x) {
     double** res = new double*[2];
     res[0] = new double[2];
@@ -270,14 +271,13 @@ double** f1jac(double* x) {
     return res;
 }
 
-//double** Newtonsys(double n) {
-//    double** res = new double*[2];
-//    double** mesh = new double*[2];
-//    mesh[0] = new double[n];
-//    mesh[1] = new double[n];
-//    double h = 20 / (n - 1);
-//    for (int i = 0; i < n; i++) {
-//        mesh[0][i] = -10 + h * i;
-//        mesh[1][i] = -10 + h * i;
-//    }
-//}
+double** f2jac(double* x) {
+    double** res = new double*[2];
+    res[0] = new double[2];
+    res[1] = new double[2];
+    res[0][0] = 2 * x[0] + 1;
+    res[0][1] = 2 * x[1] + 1;
+    res[1][0] = 2 * x[0] + x[1];
+    res[1][1] = 2 * x[1] + x[0];
+    return res;
+}
