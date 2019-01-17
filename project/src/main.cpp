@@ -21,7 +21,7 @@ int main() {
     double *rootsBisec = Bisection(localMesh, *numOfPairs,numOfRoots, ff1);
     cout << "Roots with bisection" << endl;
     Print(rootsBisec, *numOfRoots);
-    string path = "../data/dat.txt";
+    string path = "../data/grid.dat";
     *numOfRoots = 0;
     auto* rootsNewt = Newton(localMesh, *numOfPairs, numOfRoots, ff1);
     cout << "Roots with newton" << endl;
