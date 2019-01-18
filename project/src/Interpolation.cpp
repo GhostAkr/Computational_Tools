@@ -176,7 +176,6 @@ double** Polynom(double** S, double* R, int n, int m) {
 double** Spline(double** S, double* R, int n, int m) {
     n++;
     m++;
-    cout << "Number of variables is " << n << endl;
     auto** P = new double* [2];
     P[0] = R;
     P[1] = new double [m];
@@ -215,11 +214,6 @@ double** Spline(double** S, double* R, int n, int m) {
     cout << "Diagonal matrix is" << endl;
     triDiagC->matrixPrint();
     Matrix* CSolve = tridiagonalLinearSolve(triDiagC);
-    //cout << "Result with Seidel is" << endl;
-    //Matrix* CSolve = Seidel(triDiagC);
-    cout << "Result is " << endl;
-    CSolve->matrixPrint();
-    //alt->matrixPrint();
     auto* C = new double [n];  // Real coefficients for spline
     for (int i = 0; i < n; ++i) {
         if (i == 0) {
@@ -240,7 +234,7 @@ double** Spline(double** S, double* R, int n, int m) {
     Print(B, n - 1);
     auto* D = new double [n - 1];
     for (int i = 0; i < n - 1; ++i) {
-        D[i] = (C[i + 1] - C[i]) / (3.0 * H[i]);
+        D[i] = (C[i + 1] - C[i]) / (H[i] * 3.0);
     }
     cout << "D coeffs are" << endl;
     Print(D, n - 1);

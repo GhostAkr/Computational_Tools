@@ -29,8 +29,6 @@ Matrix* gaussLinearSolve(Matrix* _A) {
         cout << "Linear system has infinite number of solutions or hasn't it at all" << endl;
         return NULL;
     }
-    cout << "Triangle form is " << endl;
-    _A->matrixPrint();
     // Second part
     Matrix* result = new Matrix;
     result->matrixNullSet(rowsA, 1);
@@ -195,8 +193,6 @@ Matrix* QRBackTurn(Matrix* _Q, Matrix* _R, Matrix* _b) {
     int rows = _R->rowsGet();
     _Q->matrixTranspose();
     Matrix* bb = Matrix::matrixComp(_Q, _b);
-    //cout << "bb is" << endl;
-    //bb->matrixPrint();
     Matrix* RR = new Matrix;
     RR->matrixNullSet(rows, rows + 1);
     for (int i = 0; i < rows; ++i) {
@@ -734,7 +730,6 @@ type CUNorm(Matrix* _C) {
 
 Matrix* tridiagonalLinearSolve(const Matrix* _matrix) {
     int rows = _matrix->rowsGet();
-    cout << "rows = " << rows << endl;
     auto* a = new double [rows - 1];
     auto* b = new double [rows - 1];
     a[0] = -_matrix->matrixGet()[0][2] / _matrix->matrixGet()[0][1];
@@ -763,7 +758,5 @@ Matrix* tridiagonalLinearSolve(const Matrix* _matrix) {
     }
     delete[] a;
     delete[] b;
-//    cout << "Result is " << endl;
-//    result->matrixPrint();
     return result;
 }
