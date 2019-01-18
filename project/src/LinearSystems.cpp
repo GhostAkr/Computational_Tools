@@ -25,8 +25,11 @@ Matrix* gaussLinearSolve(Matrix* _A) {
             }
         }
     }
+    //cout << "Tridiagonal" << endl;
+    //_A->matrixPrint();
     if (!onlyDesitionCheck(_A)) {
-        cout << "Linear system has infinite number of solutions or hasn't it at all" << endl;
+        //cout << "Linear system has infinite number of solutions or hasn't it at all" << endl;
+        cout << "Determinant of matrix = 0" << endl;
         return NULL;
     }
     // Second part
@@ -197,13 +200,15 @@ Matrix* QRBackTurn(Matrix* _Q, Matrix* _R, Matrix* _b) {
     RR->matrixNullSet(rows, rows + 1);
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < rows + 1; ++j) {
-            if (j != rows + 1) {
+            if (j != rows) {
                 RR->matrixGet()[i][j] = _R->matrixGet()[i][j];
             } else {
                 RR->matrixGet()[i][j] = bb->matrixGet()[i][0];
             }
         }
     }
+//    cout << "RR" << endl;
+//    RR->matrixPrint();
     Matrix* result = new Matrix;
     result->matrixNullSet(rows, 1);
     for (int i = rows - 1; i >= 0; --i) {
@@ -211,11 +216,14 @@ Matrix* QRBackTurn(Matrix* _Q, Matrix* _R, Matrix* _b) {
         for (int j = rows - 1; j >= i; --j) {
             leftSum += RR->matrixGet()[i][j] * result->matrixGet()[j][0];
         }
+//        cout << "leftsum = " << leftSum << endl;
         result->matrixGet()[i][0] = (RR->matrixGet()[i][rows] - leftSum) / RR->matrixGet()[i][i];
         if (fabs(result->matrixGet()[i][0]) < eps) {
             result->matrixGet()[i][0] = 0.0;
         }
     }
+//    cout << "Result in method" << endl;
+//    result->matrixPrint();
     return result;
 }
 
@@ -226,6 +234,20 @@ type vectorNorm(type* _vector, size_t _rows) {
     }
     norm = sqrt(norm);
     return norm;
+}
+
+// TODO: make an exception
+type norm(Matrix* _A) {
+//    if (_A->colsGet() != 1) {
+//        cout << "Matrix is not a vector" << endl;
+//        return -1.0;
+//    }
+    type norm = 0.0;
+    double rows = _A->rowsGet();
+    for (int i = 0; i < rows; ++i) {
+        norm += _A->matrixGet()[i][0] * _A->matrixGet()[i][0];
+    }
+    return sqrt(norm);
 }
 
 void conditionNumber(Matrix* _A) {
