@@ -36,6 +36,16 @@ double** f3(double* x, int n) {
     return S;
 }
 
+double** f4(double* x, int n) {
+    double** S = new double*[2];
+    S[0] = x;
+    S[1] = new double[n];
+    for (int i = 0; i < n; i++) {
+        S[1][i] = S[0][i] * S[0][i] * S[0][i] * S[0][i] * S[0][i] - 1;
+    }
+    return S;
+}
+
 double ff1(double x) {
     return (x - 0.1) * (x - 0.22) * (x - 0.55) * (x - 0.7) * (x - 0.75);
 }
@@ -48,6 +58,10 @@ double ff3(double x) {
     double x2 = x * x;
     double x3 = x2 * x;
     return 35 * x3 - 67 * x2 - 3 * x + 3;
+}
+
+double ff4(double x) {
+    return x * x * x * x * x - 1;
 }
 
 double** rootsLocale(double** _funcMesh, int n, int* nOfPairs) {
@@ -85,7 +99,7 @@ double** rootsLocale(double** _funcMesh, int n, int* nOfPairs) {
 double* Bisection(double** _intervals, int nOfPairs, int* _nOfRoots, double f(double)) {
     auto* result = new double [nOfPairs];
     double nullEps = 1e-14;
-    double eps = 1e-5;
+    double eps = 1e-14;
     *_nOfRoots = 0;
     for (int i = 0; i < nOfPairs; i += 2) {
         double a = _intervals[0][i];
@@ -148,7 +162,6 @@ double* Newton(double** _intervals, int nOfPairs, int* _nOfRoots, double f(doubl
     double a, b, x1, x2, fa, fb, fd;
     x1 = 0;
     *_nOfRoots = 0;
-    cout << "In Newton" << endl;
     for (int i = 0; i < nOfPairs; i += 2) {
         a = _intervals[0][i];
         b = _intervals[0][i + 1];
@@ -165,7 +178,6 @@ double* Newton(double** _intervals, int nOfPairs, int* _nOfRoots, double f(doubl
         //x2 = 8;
         x2 = (fa*b - fb * a) / (fa - fb);
         int iteration = 0;
-        cout << "test" << endl;
         while (fabs(x1 - x2) >= eps) {
             ++iteration;
             x1 = x2;

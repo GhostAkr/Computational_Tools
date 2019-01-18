@@ -24,10 +24,12 @@ double** Newtonsys(double n, std::string path, int* nroot);
 double** f1(double* x, int n);
 double** f2(double* x, int n);
 double** f3(double* x, int n);
+double** f4(double* x, int n);
 
 double ff1(double x);
 double ff2(double x);
 double ff3(double x);
+double ff4(double x);
 
 double* fsys1(double* x);
 double* fsys2(double* x);
