@@ -29,8 +29,6 @@ Matrix* gaussLinearSolve(Matrix* _A) {
         cout << "Linear system has infinite number of solutions or hasn't it at all" << endl;
         return NULL;
     }
-    cout << "Triangle form is " << endl;
-    _A->matrixPrint();
     // Second part
     Matrix* result = new Matrix;
     result->matrixNullSet(rowsA, 1);
@@ -176,17 +174,6 @@ Matrix* QRDecompositionSolve(Matrix* _A, Matrix* Q, Matrix* R) {
             R->matrixGet()[i][j] = _A->matrixGet()[i][j];
         }
     }
-    //cout << "A from QR is" << endl;
-    //
-    // _A->matrixPrint();
-    //rotResultMatrix->matrixPrint();
-//    cout << "R-Matrix is" << endl;
-//    for (int i = 0; i < rows; ++i) {
-//        for (int j = 0; j < rows; ++j) {
-//            cout << _A->matrixGet()[i][j] << " ";
-//        }
-//        cout << endl;
-//    }
     delete tmp;
     delete rotResultMatrix;
     delete b;
@@ -198,8 +185,6 @@ Matrix* QRBackTurn(Matrix* _Q, Matrix* _R, Matrix* _b) {
     int rows = _R->rowsGet();
     _Q->matrixTranspose();
     Matrix* bb = Matrix::matrixComp(_Q, _b);
-    //cout << "bb is" << endl;
-    //bb->matrixPrint();
     Matrix* RR = new Matrix;
     RR->matrixNullSet(rows, rows + 1);
     for (int i = 0; i < rows; ++i) {
@@ -737,7 +722,6 @@ type CUNorm(Matrix* _C) {
 
 Matrix* tridiagonalLinearSolve(const Matrix* _matrix) {
     int rows = _matrix->rowsGet();
-    cout << "rows = " << rows << endl;
     auto* a = new double [rows - 1];
     auto* b = new double [rows - 1];
     a[0] = -_matrix->matrixGet()[0][2] / _matrix->matrixGet()[0][1];
@@ -745,10 +729,10 @@ Matrix* tridiagonalLinearSolve(const Matrix* _matrix) {
     Matrix* result = new Matrix;
     result->matrixNullSet(rows, 1);
     for (int i = 1; i < rows - 1; ++i) {
-        double A = _matrix->matrixGet()[i - 1][0];
-        double C = _matrix->matrixGet()[i - 1][1];
-        double B = _matrix->matrixGet()[i - 1][2];
-        double F = _matrix->matrixGet()[i - 1][3];
+        double A = _matrix->matrixGet()[i][0];
+        double C = _matrix->matrixGet()[i][1];
+        double B = _matrix->matrixGet()[i][2];
+        double F = _matrix->matrixGet()[i][3];
         a[i] = -B / (A * a[i - 1] + C);
         b[i] = (F - A * b[i - 1]) / (A * a[i - 1] + C);
     }
@@ -761,7 +745,5 @@ Matrix* tridiagonalLinearSolve(const Matrix* _matrix) {
     }
     delete[] a;
     delete[] b;
-    cout << "Result is " << endl;
-    result->matrixPrint();
     return result;
 }

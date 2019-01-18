@@ -129,6 +129,26 @@ double** funcexp(double* M, int n) {
     return(S);
 }
 
+double** func6(double* M, int n) {
+    double** S = new double*[2];
+    S[0] = M;
+    S[1] = new double[n];
+    for (int i = 0; i < n; i++) {
+        S[1][i] = S[0][i] * S[0][i] * S[0][i];
+    }
+    return(S);
+}
+
+double** func7(double* M, int n) {
+    double** S = new double*[2];
+    S[0] = M;
+    S[1] = new double[n];
+    for (int i = 0; i < n; i++) {
+        S[1][i] = S[0][i] * S[0][i] * S[0][i] + S[0][i] * S[0][i] + S[0][i] + 1;
+    }
+    return(S);
+}
+
 // Interpolation methods
 
 double** Polynom(double** S, double* R, int n, int m) {
@@ -155,6 +175,7 @@ double** Polynom(double** S, double* R, int n, int m) {
 
 double** Spline(double** S, double* R, int n, int m) {
     n++;
+    m++;
     auto** P = new double* [2];
     P[0] = R;
     P[1] = new double [m];
@@ -185,9 +206,11 @@ double** Spline(double** S, double* R, int n, int m) {
         triDiagC->matrixGet()[i][3] = 3.0 * (G[i + 1] - G[i]);
     }
     Matrix* CSolve = tridiagonalLinearSolve(triDiagC);
-    auto* C = new double [n - 1];  // Real coefficients for spline
-    for (int i = 0; i < n - 1; ++i) {
+    auto* C = new double [n];  // Real coefficients for spline
+    for (int i = 0; i < n; ++i) {
         if (i == 0) {
+            C[i] = 0.0;
+        } else if (i == n - 1) {
             C[i] = 0.0;
         } else {
             C[i] = CSolve->matrixGet()[i - 1][0];
@@ -199,7 +222,7 @@ double** Spline(double** S, double* R, int n, int m) {
     }
     auto* D = new double [n - 1];
     for (int i = 0; i < n - 1; ++i) {
-        D[i] = (C[i + 1] - C[i]) / (3.0 * H[i]);
+        D[i] = (C[i + 1] - C[i]) / (H[i] * 3.0);
     }
     // Building of spline
     int j = 0;  // Counter
@@ -240,8 +263,9 @@ double max(double* M, int n) {
 }
 
 double pogr(double** P, int n) {
+    n++;
     double* pogr = new double[n];
-    double** justf = func3(P[0], n);
+    double** justf = func2(P[0], n);
     for (int i = 0; i < n; i++) {
         pogr[i] = fabs(P[1][i] - justf[1][i]);
     }
