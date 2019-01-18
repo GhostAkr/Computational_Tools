@@ -91,16 +91,18 @@ double* Bisection(double** _intervals, int nOfPairs, int* _nOfRoots, double f(do
         double a = _intervals[0][i];
         double b = _intervals[0][i + 1];
         if (fabs(_intervals[1][i]) < nullEps) {
-            addRoot(result, a, _nOfRoots);
+            addRoot(result, a, _nOfRoots, 1);
             continue;
         }
         if (fabs(_intervals[1][i + 1]) < nullEps) {
-            addRoot(result, b, _nOfRoots);
+            addRoot(result, b, _nOfRoots, 1);
             continue;
         }
         double h = b - a;
         double x = (a + b) / 2.0;
+        int iteration = 0;
         while (fabs(h) > eps) {
+            iteration++;
             x = (a + b) / 2.0;
             double y = f(x);
             if ((f(a) * y) <= 0) {
@@ -110,12 +112,12 @@ double* Bisection(double** _intervals, int nOfPairs, int* _nOfRoots, double f(do
             }
             h = b - a;
         }
-        addRoot(result, x, _nOfRoots);
+        addRoot(result, x, _nOfRoots, iteration);
     }
     return result;
 }
 
-void addRoot(double* _targetArray, double _root, int* _arraySize) {
+void addRoot(double* _targetArray, double _root, int* _arraySize, int _iteration) {
     double eps = 1e-14;
     // Searching if root is in the _targetArray already
     for (int i = 0; i < *_arraySize; ++i) {
@@ -123,6 +125,7 @@ void addRoot(double* _targetArray, double _root, int* _arraySize) {
             return;
         }
     }
+    cout << "Root " << _root << " with " << _iteration << " iterations" << endl;
     _targetArray[(*_arraySize)++] = _root;
 }
 
@@ -145,29 +148,37 @@ double* Newton(double** _intervals, int nOfPairs, int* _nOfRoots, double f(doubl
     double a, b, x1, x2, fa, fb, fd;
     x1 = 0;
     *_nOfRoots = 0;
+    cout << "In Newton" << endl;
     for (int i = 0; i < nOfPairs; i += 2) {
         a = _intervals[0][i];
         b = _intervals[0][i + 1];
-        if ((fabs(_intervals[1][i]) < nullEps)||(fabs(_intervals[1][i + 1]) < nullEps)) {
-            if (fabs(_intervals[1][i]) < nullEps) {
-                addRoot(result, a, _nOfRoots);
-            }
-            if (fabs(_intervals[1][i + 1]) < nullEps) {
-                addRoot(result, b, _nOfRoots);
-
-            }
+        if (fabs(_intervals[1][i]) < nullEps) {
+            addRoot(result, a, _nOfRoots, 1);
+            continue;
+        }
+        if (fabs(_intervals[1][i + 1]) < nullEps) {
+            addRoot(result, b, _nOfRoots, 1);
             continue;
         }
         fa = f(a);
         fb = f(b);
+        //x2 = 8;
         x2 = (fa*b - fb * a) / (fa - fb);
+        int iteration = 0;
+        cout << "test" << endl;
         while (fabs(x1 - x2) >= eps) {
+            ++iteration;
             x1 = x2;
-            fd = (f(x1 + eps) - (x1)) / eps;
-            x2 = x1 - f(x1) / fd;
-
+            fd = (f(x1 + eps) - f(x1)) / eps;
+            x2 = x2 - f(x2) / fd;
+            if (x2 < a) {
+                x2 = (f(a)*x1 - f(x1) * a) / (f(a) - f(x1));
+            }
+            if (x2 > b) {
+                x2 = (f(b)*x1 - f(x1) * b) / (f(b) - f(x1));
+            }
         }
-        addRoot(result, x2, _nOfRoots);
+        addRoot(result, x2, _nOfRoots, iteration);
     }
     return result;
 }
@@ -181,16 +192,12 @@ void addSysRoot(double** _targetArray, double* _root, int* _arraySize) {
     }
     // Searching if root is in the _targetArray already
     for (int i = 0; i < *_arraySize; ++i) {
-        //cout << "diff0 = " << fabs(_targetArray[0][i] - x1) << endl;
-        //cout << "diff1 = " << fabs(_targetArray[1][i] - x2) << endl;
         if ((fabs(_targetArray[0][i] - x1) < eps) && (fabs(_targetArray[1][i] - x2) < eps)) {
             return;
         }
     }
-    int index = *_arraySize;
     _targetArray[0][*_arraySize] = x1;
     _targetArray[1][*_arraySize] = x2;
-    //cout << x1 << " " << x2 << endl;
     ++*_arraySize;
 }
 
@@ -228,9 +235,9 @@ double** Newtonsys(double n, std::string path, int* nroot) {
             x0[1] = mesh[1][j];
             iteration = 0;
             do {              //cikl newton
-                Jac = f2jac(x0);
+                Jac = f1jac(x0);
                 div = 1 / (Jac[0][0] * Jac[1][1] - Jac[1][0] * Jac[0][1]);
-                f = fsys2(x0);
+                f = fsys1(x0);
                 x1[0] = x0[0] - div * (Jac[1][1] * f[0] - Jac[0][1] * f[1]);
                 x1[1] = x0[1] - div * (-Jac[1][0] * f[0] + Jac[0][0] * f[1]);
                 norm = sqrt((x1[0] - x0[0])*(x1[0] - x0[0]) + (x1[1] - x0[1])*(x1[1] - x0[1]));
